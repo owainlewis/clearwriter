@@ -33,12 +33,16 @@ Greenfield project. Empty repo at `/Users/owainlewis/Code/mdwriter` (directory n
 ### Stack
 
 - **Rails 8.x** (latest stable) generated with `--minimal --database=postgresql --css=tailwind`, then `actionmailer` and `hotwire-rails` added back.
-- **Postgres** for primary DB (managed: Neon or Supabase Postgres to start; self-hosted on the VPS later if cost/latency justifies). Solid Queue for background jobs (magic link email delivery), Solid Cache, Solid Cable — all Postgres-backed, no Redis.
+- **Cloud SQL Postgres** (managed, GCP). Smallest viable tier in MVP (`db-g1-small`, ~$25–30/mo); upgrade when load demands. Solid Cache on the same Postgres. **No Solid Queue / Solid Cable in MVP** — Cloud Run is stateless/scale-to-zero, which fights an always-on worker.
 - **Importmaps** for JS. **CodeMirror 6** loaded via importmap CDN pins for the editor with the `@codemirror/lang-markdown` package; plain `<textarea>` fallback if JS fails.
 - **Turbo + Stimulus** for autosave debounce, edit↔preview toggle, and keyboard shortcuts. One Stimulus controller (`editor_controller.js`).
 - **commonmarker** gem for server-side markdown → HTML (GitHub-flavored, safe mode).
-- **Kamal 2** for deploy, targeting a single Hetzner CX22 or similar.
-- **Resend** (or Postmark) SMTP for transactional magic-link mail.
+- **Cloud Run** for the Rails app (containerized, scale-to-zero; optional `min-instances=1` to avoid cold starts).
+- **Artifact Registry + Cloud Build** for image builds. Deploy via `gcloud run deploy --source .` (buildpacks) for MVP; switch to a hand-rolled Dockerfile if buildpacks become limiting.
+- **Secret Manager** for `RAILS_MASTER_KEY`, DB password, Resend API key.
+- **Cloud SQL Auth Proxy** (Cloud Run native integration) for DB connections.
+- **Resend** API (HTTP, not SMTP) for transactional magic-link mail, sent **synchronously** in the request — no background queue needed for MVP volume.
+- **Domain mapping**: Cloud Run domain mapping for `clearwriter.app` (or Google-managed external HTTPS LB if mapping limits bite).
 
 ### Data model
 
@@ -142,7 +146,9 @@ DELETE /api/v1/documents/:id
 
 2. **Server-rendered preview, no client markdown parser.** Alternative: ship markdown-it or similar to the client. Chosen to keep the JS bundle tiny and the renderer single-sourced (so share-link HTML and in-app preview cannot diverge). Reversible.
 
-3. **Postgres + Solid stack, single VPS.** Alternative: SQLite (simpler) or Postgres + Redis (more moving parts). Chosen because the agent-native angle means concurrent writes from API + browser + background jobs are normal, and full-text search across SOPs is a likely v1.1 feature — both Postgres-native. Solid Queue/Cache/Cable run on the same Postgres, so no Redis. Reversible.
+3. **Cloud Run + Cloud SQL Postgres on GCP.** Alternative: Kamal on a Hetzner VPS (cheaper, more ops), or Fly.io (similar tradeoff to Cloud Run). Chosen because author already runs GCP stack — minimizes new-platform overhead. Cost is ~$15–40/mo vs $6/mo for a VPS; accepted as the cost of "I never SSH into a box." Reversible (containerized Rails ports easily).
+
+   `Assumption:` Magic-link emails sent synchronously via Resend API in MVP — no background worker needed. If volume or other async jobs appear, add **Cloud Tasks** (queue-as-a-service) over standing up an always-on Solid Queue worker.
 
 4. **Magic links coexist with password auth, both produce the same `Session`.** Alternative: magic-link-only. Chosen because password is already free from the generator and some users will prefer it; the cost is one extra controller. Reversible.
 
@@ -168,10 +174,10 @@ DELETE /api/v1/documents/:id
 
 - **Ruby**: 3.3.x (current stable as of spec; verify latest patch at `rails new` time).
 - **Rails**: 8.x latest stable.
-- **Postgres**: 16.x (current major); 17 if available at scaffold time.
+- **Postgres**: Cloud SQL Postgres 16 (current default); 17 if Cloud SQL supports it at scaffold time.
 - **CodeMirror**: 6.x via importmap pins to `https://esm.sh/@codemirror/...`.
 - **commonmarker**: 2.x (libcmark-gfm backed).
-- **Kamal**: 2.x.
+- **gcloud CLI**: latest stable; `gcloud run`, `gcloud sql`, `gcloud secrets` commands used.
 
 `Assumption:` Today is 2026-05-19; verify each version is still current at scaffolding time and pin in `Gemfile` / `.ruby-version` / `importmap.rb`.
 
