@@ -21,8 +21,8 @@ Greenfield project. Empty repo at `/Users/owainlewis/Code/mdwriter` (directory n
 5. Each document has a stable opaque public token. When sharing is enabled on a doc, `GET /d/:token` renders a read-only HTML preview accessible without auth.
 6. Each document is also reachable as raw markdown at `GET /d/:token.md` (returns `text/markdown; charset=utf-8`) when public. **The raw `.md` URL is the agent read endpoint for 80% of cases — no bearer token required for public docs.**
 7. Authenticated agents can list, read, create, update, and delete the signed-in user's documents over HTTP using a bearer token, with markdown as the request and response body for read/write of document content. **The API is a co-equal first-class client of the backend, not a v2 feature.**
-8. Auth supports both email + password and magic links. Either method produces the same `Session`.
-9. The app runs as a single Rails process against Postgres, deployable to one small VPS.
+8. Auth is email + password only (Rails 8's built-in `rails g authentication`, including default password reset). Magic links are out for v1.
+9. The app runs as a single Rails process against Postgres on Cloud Run.
 10. The editor surface — font, line-height, max-width, focus styling — must feel deliberately typographic. Default to iA Writer Mono / Duo / Quattro stack with system mono fallback.
 11. Document list is flat — no folders, no hierarchy. Organization happens through **tags** (multi-categorization, no parent/child) and **time-based filters** (default view, recent N days).
 12. The dashboard surfaces a "Recent" view (docs created or updated in the last 7 days) as the default landing for signed-in users — better than dumping the full list on every visit.
@@ -43,12 +43,14 @@ Greenfield project. Empty repo at `/Users/owainlewis/Code/mdwriter` (directory n
 - **Cloud SQL Auth Proxy** (Cloud Run native integration) for DB connections.
 - **Resend** API (HTTP, not SMTP) for transactional magic-link mail, sent **synchronously** in the request — no background queue needed for MVP volume.
 - **Domain mapping**: Cloud Run domain mapping for `clearwriter.app` (or Google-managed external HTTPS LB if mapping limits bite).
+- **Cloud CDN** fronts the public share routes (`/d/:token`, `/d/:token.md`). Cache TTL ~5 minutes with cache-tag invalidation on document update. Reduces origin load and absorbs viral-share traffic spikes.
+- **`rack-attack`** gem for in-app request throttling (auth brute-force, doc-creation spam, API rate limits).
 
 ### Data model
 
 ```
 users
-  id, email (unique, citext-like via lower-cased), password_digest (nullable), created_at, updated_at
+  id, email (unique, citext-like via lower-cased), password_digest, plan (enum: :free, :pro, default :free), created_at, updated_at
 
 sessions
   id, user_id, token (signed cookie value), user_agent, ip_address, created_at, updated_at
@@ -80,12 +82,14 @@ GET    /                        → landing page if signed out; redirect to /doc
 Auth (HTML, no auth required to hit):
 
 ```
-GET    /sign_in                 → password form + "email me a link" form
+GET    /sign_in                 → password form
 POST   /sign_in                 → password login
-GET    /sign_up                 → email + optional password
+GET    /sign_up                 → email + password
 POST   /sign_up
-POST   /magic_links             → request magic link
-GET    /magic_links/:token      → consume token, create session
+GET    /passwords/new           → request password reset
+POST   /passwords
+GET    /passwords/:token/edit   → set new password
+PATCH  /passwords/:token
 DELETE /sign_out
 ```
 
@@ -136,8 +140,8 @@ DELETE /api/v1/documents/:id
 
 ### Auth
 
-- `rails g authentication` provides the password flow.
-- Magic links: `MagicLinksController#create` looks up the user by email (creates one if signup-via-link is allowed — **Decision below**), generates `User.signed_id(purpose: :magic_link, expires_in: 15.minutes)`, mails the URL. `#show` calls `User.find_signed(token, purpose: :magic_link)` and creates a session.
+- `rails g authentication` provides email + password sign-up, sign-in, sign-out, and password reset. No custom code needed beyond styling.
+- Password reset emails sent synchronously via Resend API.
 - API: bearer token in `Authorization: Bearer <token>`. Stored as `token_digest = Digest::SHA256.hexdigest(token)`. Token is `"cw_" + SecureRandom.urlsafe_base64(24)`, shown once.
 
 ## Decisions
@@ -150,7 +154,7 @@ DELETE /api/v1/documents/:id
 
    `Assumption:` Magic-link emails sent synchronously via Resend API in MVP — no background worker needed. If volume or other async jobs appear, add **Cloud Tasks** (queue-as-a-service) over standing up an always-on Solid Queue worker.
 
-4. **Magic links coexist with password auth, both produce the same `Session`.** Alternative: magic-link-only. Chosen because password is already free from the generator and some users will prefer it; the cost is one extra controller. Reversible.
+4. **Email + password only, no magic links in v1.** Alternative: magic-links-only, or both. Chosen because password auth ships free from `rails g authentication` (zero custom code), removes the per-request mail dependency for sign-in, and the target audience (devs using agents) prefers a password manager over inbox round-trips. Reversible — magic links can be layered in later as a second entry point producing the same `Session`.
 
 5. **Public share via opaque per-document token, generated at create time, stable across toggling `is_public`.** Alternative: regenerate on each share, or use the integer ID. Chosen so links don't break if a user un-shares then re-shares; opaque so IDs aren't enumerable. Reversible (can rotate tokens).
 
@@ -158,9 +162,7 @@ DELETE /api/v1/documents/:id
 
 7. **CodeMirror 6 over a plain textarea.** Alternative: pure `<textarea>`. Chosen for subtle syntax highlighting and future typewriter-scroll / focus-mode features that define the iA Writer feel. The textarea is the no-JS fallback. Reversible.
 
-8. **Magic-link requests for unknown emails: silently succeed without creating a user or sending mail.** Alternative: auto-create user, or return "no such account." Chosen to avoid email enumeration and to keep signup an explicit action. Reversible.
-
-   `Assumption:` MVP signup is via a `/sign_up` form (email + optional password). Magic-link-only signup can be added later.
+8. **Sign-up is an explicit `/sign_up` form (email + password).** Alternative: invite-only or magic-link-on-first-use. Chosen for the lowest-friction self-serve flow that doesn't require email infra for the happy path. Reversible.
 
 9. **Tags as a Postgres `text[]` column with a GIN index, not a separate `tags` table.** Alternative: normalized `tags` + `taggings` join table. Chosen because tags have no metadata of their own (no color, no description), array containment queries (`tags @> ARRAY['onboarding']`) are fast under GIN, and the API surface stays one resource instead of three. Reversible — promote to a table if tags ever need attributes.
 
@@ -169,6 +171,31 @@ DELETE /api/v1/documents/:id
 11. **One Rails app, one domain (`clearwriter.app`), path-based split between marketing and app.** Alternative: `app.clearwriter.app` subdomain. Chosen because the most important URL in the product is the public share URL (`clearwriter.app/d/:token`) — shorter and cleaner without an `app.` prefix. Subdomain split adds ops surface (TLS, cross-subdomain cookies, two deploys) for benefits a solo dev doesn't yet need. Reversible.
 
 12. **User identity is not in any URL.** Owner edit URLs (`/documents/:id`) are session-scoped; public share URLs (`/d/:token`) use opaque tokens with no username; API URLs are bearer-scoped. `/u/:username` is reserved for the future public profile page. Chosen for shorter URLs, no rename traps, and IDOR safety. Reversible.
+
+13. **Cloud CDN in front of public share routes** (`/d/:token` and `/d/:token.md`). Alternative: serve directly from Cloud Run. Chosen because share-link reads are the hottest, most cacheable, and most viral-exposed surface in the product. Cache key includes `token`; on document update the app issues a CDN invalidation for the affected paths. Reversible.
+
+14. **Soft caps + rate limiting for abuse mitigation, not hard plan limits.** Alternative: surface caps in the UI as plan features. Chosen because "unlimited" is the marketing promise; soft caps are silent ceilings that trigger an out-of-band conversation, not a paywall hit. See `docs/product/vision.md` → "Abuse policy" for the numbers; this spec implements them.
+
+## Rate limiting and quotas
+
+Implemented as Rack middleware (`rack-attack` gem) for request-level limits and as model-level checks for resource-creation caps.
+
+**Request rate limits** (Rack::Attack throttles, keyed by user or token):
+
+- `POST /documents` (and `POST /api/v1/documents`): **100 / day / user**
+- `PATCH /documents/:id` (autosave): **600 / minute / user** (generous; autosave on heavy typing can fire ~10/min)
+- `POST /sign_in`, `POST /sign_up`, `POST /passwords`: **10 / minute / IP** (auth brute-force protection)
+- All `/api/v1/*` endpoints: **60 / minute / token**
+- Public `/d/:token` and `/d/:token.md`: not throttled in the app — Cloud CDN absorbs traffic; origin sees only cache misses.
+
+**Resource caps** (enforced at create time):
+
+- **Document count**: 10 for Free, 10,000 (soft) for Pro. Hitting 10 on Free shows an upgrade nudge; hitting 10,000 on Pro shows "you've hit our generous limit — email support and we'll lift it."
+- **Document body size**: 5 MB. Larger uploads return 413.
+- **Active public share links**: 3 for Free, unlimited for Pro.
+- **API tokens per user**: 10. Prevents token-list pollution.
+
+Plan enforcement is on a `User#plan` enum (`:free`, `:pro`) with `User#document_limit`, `User#share_link_limit` helpers. Stripe integration is out of scope for MVP — `plan` is set manually until billing exists.
 
 ## Versions
 
@@ -213,6 +240,7 @@ DELETE /api/v1/documents/:id
 - Obsidian vault import.
 
 **Out for MVP, likely v1.1+** (fits the agent-native angle, just not day one):
+- **Magic-link auth** as a second sign-in option alongside password.
 - **Full-text search** across a user's docs (Postgres `tsvector` + GIN). Tags + recent filter cover MVP; add search when usage demands it.
 - **Frontmatter parsing.** Claude skills and many SOPs have YAML frontmatter; parse it and expose as structured metadata in the API alongside the body.
 - **Expiring share links** (`public_until` timestamp). Solves the "I shared this with an agent for one task" use case cleanly.
