@@ -27,23 +27,12 @@
     <ul class="cw-doc-list">
       <% @documents.each do |document| %>
         <li class="cw-doc-list__item">
-          <div class="cw-doc-list__main">
-            <%= link_to (document.title.presence || "Untitled"), edit_document_path(document),
-                  class: "cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}" %>
-            <% if document.tags.any? %>
-              <div class="cw-doc-list__tags">
-                <% document.tags.each do |t| %>
-                  <%= link_to t, documents_path(tag: t, since: current_since), class: "cw-chip cw-chip--tag" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-          <div class="cw-doc-list__meta">
-            <span><%= document.updated_at.strftime("%b %-d") %></span>
-            <%= button_to "Delete", document_path(document), method: :delete,
-                  data: { turbo_confirm: "Delete this document?" },
-                  class: "cw-btn cw-btn--danger" %>
-          </div>
+          <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
+            <span class="cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}">
+              <%= document.title.presence || "Untitled" %>
+            </span>
+            <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
+          <% end %>
         </li>
       <% end %>
     </ul>

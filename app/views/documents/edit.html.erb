@@ -4,26 +4,38 @@
      class="cw-editor">
 
   <div class="cw-editor__bar">
-    <%= link_to "← All documents", documents_path %>
-    <div class="cw-editor__bar-right">
-      <span class="cw-editor__shortcut">⌘R toggles preview</span>
-      <span class="cw-editor__status" data-editor-target="status">Saved</span>
-    </div>
+    <span class="cw-editor__status" data-editor-target="status">Saved</span>
+
+    <details class="cw-menu">
+      <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
+      <div class="cw-menu__panel" role="menu">
+        <% if @document.is_public %>
+          <%= button_to "Unshare", document_share_path(@document), method: :delete,
+                class: "cw-menu__item" %>
+        <% else %>
+          <%= button_to "Share publicly", document_share_path(@document), method: :post,
+                class: "cw-menu__item" %>
+        <% end %>
+        <%= button_to "Delete document", document_path(@document), method: :delete,
+              data: { turbo_confirm: "Delete this document? This cannot be undone." },
+              class: "cw-menu__item cw-menu__item--danger" %>
+      </div>
+    </details>
   </div>
 
   <% if notice = flash[:notice] %>
     <p class="cw-flash cw-flash--notice"><%= notice %></p>
   <% end %>
 
-  <div class="cw-share">
-    <% if @document.is_public %>
-      <span><span class="cw-share__state">Public</span><a class="cw-share__url" href="<%= public_document_url(@document.public_token) %>" target="_blank"><%= public_document_url(@document.public_token) %></a></span>
-      <%= button_to "Unshare", document_share_path(@document), method: :delete, class: "cw-btn cw-btn--ghost" %>
-    <% else %>
-      <span class="cw-share__state cw-share__state--private">Private — only you can see this</span>
-      <%= button_to "Share publicly", document_share_path(@document), method: :post, class: "cw-btn cw-btn--primary" %>
-    <% end %>
-  </div>
+  <% if @document.is_public %>
+    <div class="cw-public-url">
+      <span class="cw-public-url__label">Public</span>
+      <a class="cw-public-url__link" href="<%= public_document_url(@document.public_token) %>" target="_blank">
+        <%= public_document_url(@document.public_token) %>
+        <span class="cw-public-url__arrow">↗</span>
+      </a>
+    </div>
+  <% end %>
 
   <%= form_with model: @document, class: "contents" do |form| %>
     <%= form.text_field :tags_text,
