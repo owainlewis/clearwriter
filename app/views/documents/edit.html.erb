@@ -1,10 +1,14 @@
 <div data-controller="editor"
      data-editor-url-value="<%= document_path(@document) %>"
+     data-editor-preview-url-value="<%= preview_document_path(@document) %>"
      class="mx-auto max-w-2xl w-full px-4 py-8">
 
   <div class="flex items-center justify-between mb-6 text-sm text-gray-500">
     <%= link_to "← All documents", documents_path, class: "hover:underline" %>
-    <span data-editor-target="status">Saved</span>
+    <div class="flex items-center gap-4">
+      <span class="hidden sm:inline text-xs text-gray-400">⌘R to toggle preview</span>
+      <span data-editor-target="status">Saved</span>
+    </div>
   </div>
 
   <%= form_with model: @document, class: "contents" do |form| %>
@@ -13,11 +17,15 @@
           data: { editor_target: "title" },
           class: "block w-full text-3xl font-bold border-0 focus:outline-none mb-4 bg-transparent placeholder:text-gray-300" %>
 
-    <div class="editor-host border border-gray-200 rounded-md p-4 min-h-[24rem] focus-within:border-blue-400">
+    <div data-editor-target="editorPane" class="editor-host border border-gray-200 rounded-md p-4 min-h-[24rem] focus-within:border-blue-400">
       <%= form.text_area :body,
             rows: 24,
             data: { editor_target: "textarea" },
             class: "block w-full font-mono text-base border-0 focus:outline-none bg-transparent resize-none" %>
+    </div>
+
+    <div data-editor-target="previewPane"
+         class="preview-host hidden border border-gray-200 rounded-md p-6 min-h-[24rem] bg-white">
     </div>
 
     <%# Manual Save is the no-JS fallback; the editor controller hides it on connect. %>
