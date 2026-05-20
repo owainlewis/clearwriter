@@ -18,6 +18,20 @@ class Document < ApplicationRecord
     public_token
   end
 
+  # Virtual attribute so the edit-page chip input can be a single text field.
+  # Splits on comma, trims, lowercases, dedupes.
+  def tags_text
+    tags.join(", ")
+  end
+
+  def tags_text=(value)
+    self.tags = value.to_s
+      .split(",")
+      .map { |t| t.strip.downcase }
+      .reject(&:blank?)
+      .uniq
+  end
+
   private
 
   def assign_public_token

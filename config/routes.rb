@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     end
     resource :share, only: %i[create destroy], controller: "shares"
   end
+  resources :tags, only: %i[index]
 
   # Public share routes (no auth). Both formats use the same path.
   get "/d/:token", to: "public_documents#show", as: :public_document, constraints: { token: /[A-Za-z0-9]+/ }
