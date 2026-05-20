@@ -24,14 +24,14 @@ const writerHighlight = HighlightStyle.define([
 const writerTheme = EditorView.theme({
   "&": {
     fontSize: "17px",
-    fontFamily: "'iA Writer Quattro S', 'iA Writer Duo S', ui-sans-serif, system-ui, -apple-system, sans-serif",
-    color: "#111827",
+    fontFamily: "var(--cw-font-prose)",
+    color: "var(--cw-ink)",
     backgroundColor: "transparent"
   },
   ".cm-content": {
-    padding: "12px 0",
+    padding: "0",
     lineHeight: "1.7",
-    caretColor: "#1d4ed8"
+    caretColor: "var(--cw-link)"
   },
   ".cm-scroller": { overflow: "auto" },
   ".cm-focused": { outline: "none" },

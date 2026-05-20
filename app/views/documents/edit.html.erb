@@ -1,32 +1,27 @@
 <div data-controller="editor"
      data-editor-url-value="<%= document_path(@document) %>"
      data-editor-preview-url-value="<%= preview_document_path(@document) %>"
-     class="mx-auto max-w-2xl w-full px-4 py-8">
+     class="cw-editor">
 
-  <div class="flex items-center justify-between mb-6 text-sm text-gray-500">
-    <%= link_to "← All documents", documents_path, class: "hover:underline" %>
-    <div class="flex items-center gap-4">
-      <span class="hidden sm:inline text-xs text-gray-400">⌘R to toggle preview</span>
-      <span data-editor-target="status">Saved</span>
+  <div class="cw-editor__bar">
+    <%= link_to "← All documents", documents_path %>
+    <div class="cw-editor__bar-right">
+      <span class="cw-editor__shortcut">⌘R toggles preview</span>
+      <span class="cw-editor__status" data-editor-target="status">Saved</span>
     </div>
   </div>
 
   <% if notice = flash[:notice] %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block"><%= notice %></p>
+    <p class="cw-flash cw-flash--notice"><%= notice %></p>
   <% end %>
 
-  <div class="mb-6 p-3 border border-gray-200 rounded-md flex items-center justify-between gap-4 text-sm">
+  <div class="cw-share">
     <% if @document.is_public %>
-      <div>
-        <span class="text-green-700 font-medium">Public</span> ·
-        <%= link_to public_document_url(@document.public_token), public_document_url(@document.public_token), class: "text-blue-700 hover:underline break-all", target: "_blank" %>
-      </div>
-      <%= button_to "Unshare", document_share_path(@document), method: :delete,
-            class: "rounded-md px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium cursor-pointer" %>
+      <span><span class="cw-share__state">Public</span><a class="cw-share__url" href="<%= public_document_url(@document.public_token) %>" target="_blank"><%= public_document_url(@document.public_token) %></a></span>
+      <%= button_to "Unshare", document_share_path(@document), method: :delete, class: "cw-btn cw-btn--ghost" %>
     <% else %>
-      <span class="text-gray-500">This document is private.</span>
-      <%= button_to "Share publicly", document_share_path(@document), method: :post,
-            class: "rounded-md px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+      <span class="cw-share__state cw-share__state--private">Private — only you can see this</span>
+      <%= button_to "Share publicly", document_share_path(@document), method: :post, class: "cw-btn cw-btn--primary" %>
     <% end %>
   </div>
 
@@ -34,28 +29,26 @@
     <%= form.text_field :title,
           placeholder: "Title",
           data: { editor_target: "title" },
-          class: "block w-full text-3xl font-bold border-0 focus:outline-none mb-2 bg-transparent placeholder:text-gray-300" %>
+          class: "cw-editor__title" %>
 
     <%= form.text_field :tags_text,
           placeholder: "tags, comma, separated",
           value: @document.tags_text,
           data: { editor_target: "tags" },
-          class: "block w-full text-sm text-gray-600 border-0 focus:outline-none mb-4 bg-transparent placeholder:text-gray-300" %>
+          class: "cw-editor__tags" %>
 
-    <div data-editor-target="editorPane" class="editor-host border border-gray-200 rounded-md p-4 min-h-[24rem] focus-within:border-blue-400">
+    <div data-editor-target="editorPane" class="cw-editor__host">
       <%= form.text_area :body,
             rows: 24,
             data: { editor_target: "textarea" },
-            class: "block w-full font-mono text-base border-0 focus:outline-none bg-transparent resize-none" %>
+            placeholder: "Write markdown here…" %>
     </div>
 
-    <div data-editor-target="previewPane"
-         class="preview-host hidden border border-gray-200 rounded-md p-6 min-h-[24rem] bg-white">
-    </div>
+    <div data-editor-target="previewPane" class="preview-host hidden"></div>
 
     <%# Manual Save is the no-JS fallback; the editor controller hides it on connect. %>
-    <div class="mt-4 flex justify-end" data-editor-target="fallbackSave">
-      <%= form.submit "Save", class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+    <div style="margin-top: 16px; display: flex; justify-content: flex-end;" data-editor-target="fallbackSave">
+      <%= form.submit "Save", class: "cw-btn cw-btn--primary" %>
     </div>
   <% end %>
 </div>
