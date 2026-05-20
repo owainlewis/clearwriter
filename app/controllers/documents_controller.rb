@@ -46,7 +46,9 @@ class DocumentsController < ApplicationController
   end
 
   def document_params
-    params.expect(document: [ :title, :body, :tags_text ])
+    # title is derived from the body's first heading on save (see Document#derive_title_from_body),
+    # so it isn't accepted from the form.
+    params.expect(document: [ :body, :tags_text ])
   end
 
   # Accepts "7d", "30d", "all", or nil. Defaults to 7 days (the Recent view)
