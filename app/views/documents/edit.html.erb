@@ -1,0 +1,17 @@
+<div class="mx-auto md:w-2/3 w-full py-8">
+  <div class="flex items-center justify-between mb-4">
+    <%= link_to "← All documents", documents_path, class: "text-sm text-gray-600 hover:underline" %>
+    <span class="text-xs text-gray-400">Saved <%= time_ago_in_words(@document.updated_at) %> ago</span>
+  </div>
+
+  <%# Minimal editor — CodeMirror lands in #6, autosave in #7. %>
+  <%= form_with model: @document, class: "contents" do |form| %>
+    <%= form.text_field :title, placeholder: "Title (or use # H1 in body)",
+          class: "block w-full text-2xl font-bold border-0 focus:outline-none mb-2 bg-transparent" %>
+    <%= form.text_area :body, rows: 24, placeholder: "Write markdown here…",
+          class: "block w-full font-mono text-base border border-gray-200 rounded-md p-4 focus:outline-blue-600" %>
+    <div class="mt-4">
+      <%= form.submit "Save", class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

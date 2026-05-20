@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
 
   # App
+  resources :documents, only: %i[index create edit update destroy]
   root "home#index"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
