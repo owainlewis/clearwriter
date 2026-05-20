@@ -4,23 +4,31 @@
      class="cw-editor">
 
   <div class="cw-editor__bar">
-    <span class="cw-editor__status" data-editor-target="status">Saved</span>
+    <span class="cw-editor__bar-spacer"></span>
 
-    <details class="cw-menu">
-      <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
-      <div class="cw-menu__panel" role="menu">
-        <% if @document.is_public %>
-          <%= button_to "Unshare", document_share_path(@document), method: :delete,
-                class: "cw-menu__item" %>
-        <% else %>
-          <%= button_to "Share publicly", document_share_path(@document), method: :post,
-                class: "cw-menu__item" %>
-        <% end %>
-        <%= button_to "Delete document", document_path(@document), method: :delete,
-              data: { turbo_confirm: "Delete this document? This cannot be undone." },
-              class: "cw-menu__item cw-menu__item--danger" %>
-      </div>
-    </details>
+    <div class="cw-editor__bar-right">
+      <span class="cw-status-dot"
+            data-editor-target="status"
+            data-state="saved"
+            title="Saved"
+            aria-label="Save status"></span>
+
+      <details class="cw-menu">
+        <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
+        <div class="cw-menu__panel" role="menu">
+          <% if @document.is_public %>
+            <%= button_to "Unshare", document_share_path(@document), method: :delete,
+                  class: "cw-menu__item" %>
+          <% else %>
+            <%= button_to "Share publicly", document_share_path(@document), method: :post,
+                  class: "cw-menu__item" %>
+          <% end %>
+          <%= button_to "Delete document", document_path(@document), method: :delete,
+                data: { turbo_confirm: "Delete this document? This cannot be undone." },
+                class: "cw-menu__item cw-menu__item--danger" %>
+        </div>
+      </details>
+    </div>
   </div>
 
   <% if notice = flash[:notice] %>

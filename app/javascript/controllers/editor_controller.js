@@ -209,7 +209,7 @@ export default class extends Controller {
     if (!this.urlValue) return
 
     this.savingCount += 1
-    this.setStatus("Saving…")
+    this.setStatus("saving", "Saving…")
 
     const body = new URLSearchParams()
     body.set("document[body]", this.textareaTarget.value)
@@ -236,20 +236,26 @@ export default class extends Controller {
       if (this.savingCount === 0) {
         const now = new Date()
         const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        this.setStatus(`Saved at ${time}`)
+        this.setStatus("saved", `Saved at ${time}`)
       }
     } catch (err) {
       this.savingCount -= 1
       this.backoff = this.backoff === 0 ? 2_000 : Math.min(this.backoff * 2, MAX_BACKOFF_MS)
-      this.setStatus(`Couldn't save — retrying in ${Math.round(this.backoff / 1000)}s`)
+      this.setStatus("error", `Couldn't save — retrying in ${Math.round(this.backoff / 1000)}s`)
       setTimeout(() => this.save(), this.backoff)
     }
   }
 
-  setStatus(message) {
-    if (this.hasStatusTarget) {
-      this.statusTarget.textContent = message
-    }
+  setStatus(state, label) {
+    if (!this.hasStatusTarget) return
+    this.statusTarget.dataset.state = state
+    this.statusTarget.setAttribute("title", label)
+  }
+
+  updateWordCount(text) {
+    if (!this.hasWordCountTarget) return
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0
+    this.wordCountTarget.textContent = `${words.toLocaleString()} word${words === 1 ? "" : "s"}`
   }
 
   csrfToken() {
