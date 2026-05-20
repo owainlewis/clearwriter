@@ -2,7 +2,15 @@ class DocumentsController < ApplicationController
   before_action :set_document, only: %i[edit update destroy preview]
 
   def index
-    @documents = Current.user.documents.order(updated_at: :desc)
+    scope = Current.user.documents.order(updated_at: :desc)
+
+    @tag = params[:tag].presence
+    @since = parse_since(params[:since])
+
+    scope = scope.with_tag(@tag) if @tag
+    scope = scope.updated_since(@since) if @since
+
+    @documents = scope
   end
 
   def create
@@ -38,6 +46,17 @@ class DocumentsController < ApplicationController
   end
 
   def document_params
-    params.expect(document: [ :title, :body, { tags: [] } ])
+    params.expect(document: [ :title, :body, :tags_text ])
+  end
+
+  # Accepts "7d", "30d", "all", or nil. Defaults to 7 days (the Recent view)
+  # when the param is absent. Returns nil to mean "no filter."
+  def parse_since(value)
+    case value
+    when nil, "" then 7.days.ago
+    when "all" then nil
+    when /\A(\d+)d\z/ then Regexp.last_match(1).to_i.days.ago
+    else 7.days.ago
+    end
   end
 end

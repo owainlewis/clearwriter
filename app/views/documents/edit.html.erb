@@ -34,7 +34,13 @@
     <%= form.text_field :title,
           placeholder: "Title",
           data: { editor_target: "title" },
-          class: "block w-full text-3xl font-bold border-0 focus:outline-none mb-4 bg-transparent placeholder:text-gray-300" %>
+          class: "block w-full text-3xl font-bold border-0 focus:outline-none mb-2 bg-transparent placeholder:text-gray-300" %>
+
+    <%= form.text_field :tags_text,
+          placeholder: "tags, comma, separated",
+          value: @document.tags_text,
+          data: { editor_target: "tags" },
+          class: "block w-full text-sm text-gray-600 border-0 focus:outline-none mb-4 bg-transparent placeholder:text-gray-300" %>
 
     <div data-editor-target="editorPane" class="editor-host border border-gray-200 rounded-md p-4 min-h-[24rem] focus-within:border-blue-400">
       <%= form.text_area :body,

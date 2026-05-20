@@ -9,16 +9,44 @@
           class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
   </div>
 
+  <%# Filters: time range + tag. %>
+  <% current_since = params[:since].presence || "7d" %>
+  <nav class="flex items-center flex-wrap gap-2 mb-4 text-sm">
+    <% [["7d", "Last 7 days"], ["30d", "Last 30 days"], ["all", "All"]].each do |val, label| %>
+      <% active = current_since == val %>
+      <%= link_to label, documents_path(since: val, tag: @tag),
+            class: "px-3 py-1 rounded-full border #{active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}" %>
+    <% end %>
+
+    <% if @tag %>
+      <span class="ml-2 text-gray-500">Tag:</span>
+      <%= link_to "#{@tag} ✕", documents_path(since: current_since),
+            class: "px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100" %>
+    <% end %>
+
+    <span class="ml-auto"><%= link_to "Browse tags →", tags_path, class: "text-blue-700 hover:underline" %></span>
+  </nav>
+
   <% if @documents.empty? %>
-    <p class="text-gray-500">No documents yet. Create one to get started.</p>
+    <p class="text-gray-500 py-8">No documents in this view. Try “All” or create one.</p>
   <% else %>
     <ul class="divide-y divide-gray-200">
       <% @documents.each do |document| %>
-        <li class="py-3 flex items-center justify-between">
-          <%= link_to (document.title.presence || "Untitled"), edit_document_path(document),
-                class: "text-blue-700 hover:underline truncate" %>
-          <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-400"><%= document.updated_at.strftime("%b %-d, %Y") %></span>
+        <li class="py-3 flex items-center justify-between gap-4">
+          <div class="min-w-0 flex-1">
+            <%= link_to (document.title.presence || "Untitled"), edit_document_path(document),
+                  class: "text-blue-700 hover:underline truncate block" %>
+            <% if document.tags.any? %>
+              <div class="mt-1 flex flex-wrap gap-1">
+                <% document.tags.each do |t| %>
+                  <%= link_to t, documents_path(tag: t, since: current_since),
+                        class: "text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <div class="flex items-center gap-4 shrink-0">
+            <span class="text-sm text-gray-400 hidden sm:inline"><%= document.updated_at.strftime("%b %-d") %></span>
             <%= button_to "Delete", document_path(document), method: :delete,
                   data: { turbo_confirm: "Delete this document?" },
                   class: "text-sm text-red-600 hover:underline bg-transparent border-0 cursor-pointer" %>
