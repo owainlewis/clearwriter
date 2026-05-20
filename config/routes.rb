@@ -12,7 +12,12 @@ Rails.application.routes.draw do
     member do
       post :preview
     end
+    resource :share, only: %i[create destroy], controller: "shares"
   end
+
+  # Public share routes (no auth). Both formats use the same path.
+  get "/d/:token", to: "public_documents#show", as: :public_document, constraints: { token: /[A-Za-z0-9]+/ }
+
   root "home#index"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

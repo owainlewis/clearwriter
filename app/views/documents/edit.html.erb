@@ -11,6 +11,25 @@
     </div>
   </div>
 
+  <% if notice = flash[:notice] %>
+    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block"><%= notice %></p>
+  <% end %>
+
+  <div class="mb-6 p-3 border border-gray-200 rounded-md flex items-center justify-between gap-4 text-sm">
+    <% if @document.is_public %>
+      <div>
+        <span class="text-green-700 font-medium">Public</span> ·
+        <%= link_to public_document_url(@document.public_token), public_document_url(@document.public_token), class: "text-blue-700 hover:underline break-all", target: "_blank" %>
+      </div>
+      <%= button_to "Unshare", document_share_path(@document), method: :delete,
+            class: "rounded-md px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium cursor-pointer" %>
+    <% else %>
+      <span class="text-gray-500">This document is private.</span>
+      <%= button_to "Share publicly", document_share_path(@document), method: :post,
+            class: "rounded-md px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+    <% end %>
+  </div>
+
   <%= form_with model: @document, class: "contents" do |form| %>
     <%= form.text_field :title,
           placeholder: "Title",
