@@ -1,10 +1,47 @@
 import { Controller } from "@hotwired/stimulus"
-import { EditorView, keymap, drawSelection } from "@codemirror/view"
+import { EditorView, keymap, drawSelection, ViewPlugin, Decoration } from "@codemirror/view"
 import { EditorState } from "@codemirror/state"
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands"
 import { markdown } from "@codemirror/lang-markdown"
-import { syntaxHighlighting, defaultHighlightStyle, HighlightStyle } from "@codemirror/language"
+import { syntaxHighlighting, defaultHighlightStyle, HighlightStyle, syntaxTree } from "@codemirror/language"
 import { tags } from "@lezer/highlight"
+
+// Hanging-indent for markdown headings.
+//
+// All body lines get a small left padding so the `#` symbols on heading
+// lines visually overhang into the margin — classic iA-Writer typography
+// trick that makes heading structure obvious while editing.
+//
+// We scan the syntax tree for visible ATXHeading1..6 nodes and tag those
+// lines with `cm-heading-line`; CSS does the rest (see writerTheme below).
+const headingLineDeco = Decoration.line({ class: "cm-heading-line" })
+
+const hangingHeadingsPlugin = ViewPlugin.fromClass(
+  class {
+    constructor(view) { this.decorations = this.compute(view) }
+    update(update) {
+      if (update.docChanged || update.viewportChanged) {
+        this.decorations = this.compute(update.view)
+      }
+    }
+    compute(view) {
+      const ranges = []
+      for (const { from, to } of view.visibleRanges) {
+        syntaxTree(view.state).iterate({
+          from, to,
+          enter: (node) => {
+            if (/^ATXHeading[1-6]$/.test(node.name)) {
+              const line = view.state.doc.lineAt(node.from)
+              ranges.push(headingLineDeco.range(line.from))
+            }
+          }
+        })
+      }
+      return Decoration.set(ranges, true)
+    }
+  },
+  { decorations: v => v.decorations }
+)
 
 const writerHighlight = HighlightStyle.define([
   { tag: tags.heading1, fontWeight: "700", fontSize: "1.6em", lineHeight: "1.3" },
@@ -35,7 +72,9 @@ const writerTheme = EditorView.theme({
   },
   ".cm-scroller": { overflow: "auto" },
   ".cm-focused": { outline: "none" },
-  ".cm-line": { padding: "0" }
+  // Body lines indent right; heading lines reset to 0 so the `#` overhangs.
+  ".cm-line": { paddingLeft: "1.4em" },
+  ".cm-heading-line": { paddingLeft: "0" }
 })
 
 const SAVE_DEBOUNCE_MS = 800
@@ -67,6 +106,7 @@ export default class extends Controller {
         drawSelection(),
         EditorView.lineWrapping,
         markdown(),
+        hangingHeadingsPlugin,
         syntaxHighlighting(writerHighlight),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         writerTheme,
