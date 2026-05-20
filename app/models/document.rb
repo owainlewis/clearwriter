@@ -3,9 +3,12 @@ class Document < ApplicationRecord
   PUBLIC_TOKEN_LENGTH = 22
   MAX_BODY_BYTES = 5.megabytes
 
+  TITLE_FALLBACK_LIMIT = 80
+
   belongs_to :user
 
   before_validation :assign_public_token, on: :create
+  before_save :derive_title_from_body
 
   validates :public_token, presence: true, uniqueness: true
   validate :body_within_byte_limit
@@ -51,5 +54,32 @@ class Document < ApplicationRecord
     return if body.bytesize <= MAX_BODY_BYTES
 
     errors.add(:body, "must be at most #{MAX_BODY_BYTES / 1.megabyte} MB")
+  end
+
+  # iA Writer style: the document title IS the first H1 (or first non-empty
+  # line if no H1 exists). The user never edits title directly — it's derived
+  # on every save so the list view and metadata stay in sync with the body.
+  def derive_title_from_body
+    self.title = compute_title_from(body)
+  end
+
+  def compute_title_from(text)
+    return "" if text.blank?
+
+    text.each_line do |line|
+      stripped = line.strip
+      next if stripped.empty?
+
+      if stripped.start_with?("# ")
+        return stripped.sub(/\A#+\s*/, "").sub(/\s*#*\s*\z/, "").strip
+      end
+
+      truncated = stripped.length > TITLE_FALLBACK_LIMIT ?
+        stripped[0, TITLE_FALLBACK_LIMIT - 1] + "…" :
+        stripped
+      return truncated
+    end
+
+    ""
   end
 end

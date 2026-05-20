@@ -42,7 +42,7 @@ const SAVE_DEBOUNCE_MS = 800
 const MAX_BACKOFF_MS = 60_000
 
 export default class extends Controller {
-  static targets = ["textarea", "title", "tags", "status", "fallbackSave", "editorPane", "previewPane"]
+  static targets = ["textarea", "tags", "status", "fallbackSave", "editorPane", "previewPane"]
   static values = { url: String, previewUrl: String }
 
   connect() {
@@ -87,9 +87,6 @@ export default class extends Controller {
       parent: this.hasEditorPaneTarget ? this.editorPaneTarget : this.element
     })
 
-    if (this.hasTitleTarget) {
-      this.titleTarget.addEventListener("input", () => this.scheduleSave())
-    }
     if (this.hasTagsTarget) {
       this.tagsTarget.addEventListener("input", () => this.scheduleSave())
     }
@@ -176,9 +173,6 @@ export default class extends Controller {
 
     const body = new URLSearchParams()
     body.set("document[body]", this.textareaTarget.value)
-    if (this.hasTitleTarget) {
-      body.set("document[title]", this.titleTarget.value)
-    }
     if (this.hasTagsTarget) {
       body.set("document[tags_text]", this.tagsTarget.value)
     }

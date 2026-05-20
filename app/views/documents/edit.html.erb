@@ -26,11 +26,6 @@
   </div>
 
   <%= form_with model: @document, class: "contents" do |form| %>
-    <%= form.text_field :title,
-          placeholder: "Title",
-          data: { editor_target: "title" },
-          class: "cw-editor__title" %>
-
     <%= form.text_field :tags_text,
           placeholder: "tags, comma, separated",
           value: @document.tags_text,
@@ -41,7 +36,7 @@
       <%= form.text_area :body,
             rows: 24,
             data: { editor_target: "textarea" },
-            placeholder: "Write markdown here…" %>
+            placeholder: "# Start with a heading…" %>
     </div>
 
     <div data-editor-target="previewPane" class="preview-host hidden"></div>

@@ -49,8 +49,9 @@ module Api
       end
 
       def document_params_safe
-        # JSON or form-encoded both accepted. Tags can be a comma string or array.
-        permitted = params.permit(:title, :body, :tags_text, tags: [])
+        # title is derived from the body's first heading server-side, so it
+        # isn't accepted from the API either. Tags can be a comma string or array.
+        permitted = params.permit(:body, :tags_text, tags: [])
         if permitted[:tags].is_a?(Array)
           permitted[:tags] = permitted[:tags].map { |t| t.to_s.strip.downcase }.reject(&:blank?).uniq
         end
