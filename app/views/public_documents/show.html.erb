@@ -1,0 +1,10 @@
+<div class="mx-auto max-w-2xl w-full px-4 py-12">
+  <div class="preview-host">
+    <%= ClearwriterMarkdown.render(@document.body) %>
+  </div>
+
+  <footer class="mt-16 pt-6 border-t border-gray-200 text-xs text-gray-400 flex items-center justify-between">
+    <span>Made with <a class="underline hover:no-underline" href="/">Clearwriter</a></span>
+    <span><%= @document.updated_at.strftime("%b %-d, %Y") %></span>
+  </footer>
+</div>
