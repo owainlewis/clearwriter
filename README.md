@@ -1,24 +1,18 @@
-# README
+# Clearwriter
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Agent-native online writing for SOPs, prompts, and skills. A minimalist markdown editor in the browser where humans get a beautiful share link and agents get a raw `.md` HTTP endpoint at the same URL.
 
-Things you may want to cover:
+## Run
 
-* Ruby version
+```
+bundle install
+bin/rails db:setup
+bin/dev
+```
 
-* System dependencies
+App at http://localhost:3000.
 
-* Configuration
+## Docs
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- [Technical spec](docs/mvp/spec.md)
+- [Product vision](docs/product/vision.md)
