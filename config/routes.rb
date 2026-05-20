@@ -16,6 +16,19 @@ Rails.application.routes.draw do
   end
   resources :tags, only: %i[index]
 
+  namespace :settings do
+    resources :api_tokens, only: %i[index create destroy]
+  end
+
+  # JSON / markdown API
+  namespace :api do
+    namespace :v1 do
+      resources :documents, only: %i[index create show update destroy] do
+        resource :content, only: %i[show update]
+      end
+    end
+  end
+
   # Public share routes (no auth). Both formats use the same path.
   get "/d/:token", to: "public_documents#show", as: :public_document, constraints: { token: /[A-Za-z0-9]+/ }
 
