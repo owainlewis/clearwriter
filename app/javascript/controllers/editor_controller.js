@@ -38,12 +38,23 @@ const writerTheme = EditorView.theme({
   ".cm-line": { padding: "0" }
 })
 
+const SAVE_DEBOUNCE_MS = 800
+const MAX_BACKOFF_MS = 60_000
+
 export default class extends Controller {
-  static targets = ["textarea"]
+  static targets = ["textarea", "title", "status", "fallbackSave"]
+  static values = { url: String }
 
   connect() {
+    this.backoff = 0
+    this.savingCount = 0
+
     const textarea = this.textareaTarget
     textarea.style.display = "none"
+
+    if (this.hasFallbackSaveTarget) {
+      this.fallbackSaveTarget.style.display = "none"
+    }
 
     const startState = EditorState.create({
       doc: textarea.value,
@@ -59,6 +70,7 @@ export default class extends Controller {
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             textarea.value = update.state.doc.toString()
+            this.scheduleSave()
           }
         })
       ]
@@ -68,6 +80,10 @@ export default class extends Controller {
       state: startState,
       parent: this.element
     })
+
+    if (this.hasTitleTarget) {
+      this.titleTarget.addEventListener("input", () => this.scheduleSave())
+    }
   }
 
   disconnect() {
@@ -78,5 +94,66 @@ export default class extends Controller {
     if (this.hasTextareaTarget) {
       this.textareaTarget.style.display = ""
     }
+    if (this.saveTimer) {
+      clearTimeout(this.saveTimer)
+      this.saveTimer = null
+    }
+  }
+
+  scheduleSave() {
+    if (this.saveTimer) clearTimeout(this.saveTimer)
+    this.saveTimer = setTimeout(() => this.save(), SAVE_DEBOUNCE_MS)
+  }
+
+  async save() {
+    if (!this.urlValue) return
+
+    this.savingCount += 1
+    this.setStatus("Saving…")
+
+    const body = new URLSearchParams()
+    body.set("document[body]", this.textareaTarget.value)
+    if (this.hasTitleTarget) {
+      body.set("document[title]", this.titleTarget.value)
+    }
+
+    try {
+      const response = await fetch(this.urlValue, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRF-Token": this.csrfToken(),
+          "Accept": "text/vnd.turbo-stream.html, text/html"
+        },
+        credentials: "same-origin",
+        body
+      })
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+      this.savingCount -= 1
+      this.backoff = 0
+      if (this.savingCount === 0) {
+        const now = new Date()
+        const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        this.setStatus(`Saved at ${time}`)
+      }
+    } catch (err) {
+      this.savingCount -= 1
+      this.backoff = this.backoff === 0 ? 2_000 : Math.min(this.backoff * 2, MAX_BACKOFF_MS)
+      this.setStatus(`Couldn't save — retrying in ${Math.round(this.backoff / 1000)}s`)
+      setTimeout(() => this.save(), this.backoff)
+    }
+  }
+
+  setStatus(message) {
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = message
+    }
+  }
+
+  csrfToken() {
+    const meta = document.querySelector('meta[name="csrf-token"]')
+    return meta ? meta.content : ""
   }
 }
