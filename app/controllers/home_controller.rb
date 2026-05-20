@@ -1,7 +1,8 @@
 class HomeController < ApplicationController
   def index
-    # Placeholder for the signed-in dashboard.
-    # Issue #5 replaces this with the documents list;
-    # issue #14 adds the signed-out landing page.
+    # Signed-in: send to the documents list.
+    # Signed-out: Authentication concern already redirects to /sign_in.
+    # The signed-out landing page lands in #14.
+    redirect_to documents_path
   end
 end
