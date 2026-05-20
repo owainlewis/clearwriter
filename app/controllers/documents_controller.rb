@@ -1,5 +1,5 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, only: %i[edit update destroy]
+  before_action :set_document, only: %i[edit update destroy preview]
 
   def index
     @documents = Current.user.documents.order(updated_at: :desc)
@@ -21,6 +21,14 @@ class DocumentsController < ApplicationController
   def destroy
     @document.destroy!
     redirect_to documents_path, notice: "Document deleted."
+  end
+
+  # POST /documents/:id/preview — renders the supplied body (or saved body
+  # if none given) to HTML. Used by the edit-page ⌘R toggle so the preview
+  # reflects unsaved changes without writing them.
+  def preview
+    body = params[:body].presence || @document.body
+    render html: ClearwriterMarkdown.render(body), layout: false
   end
 
   private

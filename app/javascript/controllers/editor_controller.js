@@ -42,12 +42,13 @@ const SAVE_DEBOUNCE_MS = 800
 const MAX_BACKOFF_MS = 60_000
 
 export default class extends Controller {
-  static targets = ["textarea", "title", "status", "fallbackSave"]
-  static values = { url: String }
+  static targets = ["textarea", "title", "status", "fallbackSave", "editorPane", "previewPane"]
+  static values = { url: String, previewUrl: String }
 
   connect() {
     this.backoff = 0
     this.savingCount = 0
+    this.previewing = false
 
     const textarea = this.textareaTarget
     textarea.style.display = "none"
@@ -55,6 +56,9 @@ export default class extends Controller {
     if (this.hasFallbackSaveTarget) {
       this.fallbackSaveTarget.style.display = "none"
     }
+
+    this.boundKeydown = this.onKeydown.bind(this)
+    window.addEventListener("keydown", this.boundKeydown)
 
     const startState = EditorState.create({
       doc: textarea.value,
@@ -97,6 +101,60 @@ export default class extends Controller {
     if (this.saveTimer) {
       clearTimeout(this.saveTimer)
       this.saveTimer = null
+    }
+    if (this.boundKeydown) {
+      window.removeEventListener("keydown", this.boundKeydown)
+      this.boundKeydown = null
+    }
+  }
+
+  onKeydown(event) {
+    // ⌘R or ⌘⇧P → toggle preview. Don't shadow browser refresh when in a form field with no editor.
+    const isCmdR = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "r"
+    const isCmdShiftP = (event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "p"
+    if (!(isCmdR || isCmdShiftP)) return
+
+    event.preventDefault()
+    this.togglePreview()
+  }
+
+  async togglePreview() {
+    if (!this.hasPreviewPaneTarget || !this.hasEditorPaneTarget) return
+
+    if (this.previewing) {
+      this.previewPaneTarget.classList.add("hidden")
+      this.editorPaneTarget.classList.remove("hidden")
+      this.previewing = false
+      if (this.view) this.view.focus()
+      return
+    }
+
+    if (!this.previewUrlValue) return
+
+    try {
+      const body = new URLSearchParams()
+      body.set("body", this.textareaTarget.value)
+
+      const response = await fetch(this.previewUrlValue, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRF-Token": this.csrfToken(),
+          "Accept": "text/html"
+        },
+        credentials: "same-origin",
+        body
+      })
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+
+      const html = await response.text()
+      this.previewPaneTarget.innerHTML = html
+      this.editorPaneTarget.classList.add("hidden")
+      this.previewPaneTarget.classList.remove("hidden")
+      this.previewing = true
+    } catch (err) {
+      this.setStatus("Couldn't render preview")
     }
   }
 

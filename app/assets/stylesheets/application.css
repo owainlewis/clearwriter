@@ -1,10 +1,48 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * Application-wide styles. Tailwind utilities load via the tailwindcss-rails build;
+ * anything here is additive and addresses what utilities don't cover cleanly.
  */
+
+/* Rendered-markdown preview pane. Minimal typography until #15 makes a proper pass. */
+.preview-host {
+  color: #111827;
+  font-size: 17px;
+  line-height: 1.7;
+  font-family: 'iA Writer Quattro S', 'iA Writer Duo S', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+.preview-host h1 { font-size: 1.9em; font-weight: 700; margin: 1rem 0 0.75rem; }
+.preview-host h2 { font-size: 1.5em; font-weight: 700; margin: 1.25rem 0 0.5rem; }
+.preview-host h3 { font-size: 1.25em; font-weight: 700; margin: 1rem 0 0.5rem; }
+.preview-host p  { margin: 0.75rem 0; }
+.preview-host ul, .preview-host ol { margin: 0.75rem 0 0.75rem 1.5rem; }
+.preview-host li { margin: 0.25rem 0; }
+.preview-host a  { color: #1d4ed8; text-decoration: underline; }
+.preview-host strong { font-weight: 700; }
+.preview-host em { font-style: italic; }
+.preview-host code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #f3f4f6;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-size: 0.95em;
+}
+.preview-host pre {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.95em;
+  margin: 1rem 0;
+}
+.preview-host pre code { background: transparent; padding: 0; }
+.preview-host blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 1rem;
+  color: #4b5563;
+  font-style: italic;
+  margin: 1rem 0;
+}
+.preview-host hr { border: none; border-top: 1px solid #e5e7eb; margin: 2rem 0; }
+.preview-host table { border-collapse: collapse; margin: 1rem 0; }
+.preview-host th, .preview-host td { border: 1px solid #e5e7eb; padding: 0.5rem 0.75rem; }
+.preview-host th { background: #f9fafb; font-weight: 600; }
