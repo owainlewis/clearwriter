@@ -4,13 +4,13 @@ class SharesController < ApplicationController
   # POST /documents/:document_id/share
   def create
     @document.update!(is_public: true)
-    redirect_to edit_document_path(@document), notice: "Share link enabled."
+    redirect_to edit_document_path(@document)
   end
 
   # DELETE /documents/:document_id/share
   def destroy
     @document.update!(is_public: false)
-    redirect_to edit_document_path(@document), notice: "Share link disabled."
+    redirect_to edit_document_path(@document)
   end
 
   private

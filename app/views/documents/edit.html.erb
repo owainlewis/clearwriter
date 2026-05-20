@@ -17,6 +17,13 @@
         <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
         <div class="cw-menu__panel" role="menu">
           <% if @document.is_public %>
+            <div class="cw-menu__readout">
+              <div class="cw-menu__readout-label">Public link</div>
+              <a class="cw-menu__readout-value" href="<%= public_document_url(@document.public_token) %>" target="_blank">
+                <%= public_document_url(@document.public_token) %>
+                <span class="cw-menu__readout-arrow">↗</span>
+              </a>
+            </div>
             <%= button_to "Unshare", document_share_path(@document), method: :delete,
                   class: "cw-menu__item" %>
           <% else %>
@@ -30,20 +37,6 @@
       </details>
     </div>
   </div>
-
-  <% if notice = flash[:notice] %>
-    <p class="cw-flash cw-flash--notice"><%= notice %></p>
-  <% end %>
-
-  <% if @document.is_public %>
-    <div class="cw-public-url">
-      <span class="cw-public-url__label">Public</span>
-      <a class="cw-public-url__link" href="<%= public_document_url(@document.public_token) %>" target="_blank">
-        <%= public_document_url(@document.public_token) %>
-        <span class="cw-public-url__arrow">↗</span>
-      </a>
-    </div>
-  <% end %>
 
   <%= form_with model: @document, class: "contents" do |form| %>
     <%= form.text_field :tags_text,
