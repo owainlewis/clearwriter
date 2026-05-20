@@ -18,23 +18,12 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="app-shell">
+  <body class="<%= authenticated? ? 'app-shell' : 'app-shell--plain' %>">
     <% if authenticated? %>
-      <header class="app-header">
-        <div class="app-header__inner">
-          <%= link_to "Clearwriter", documents_path, class: "app-header__brand" %>
-          <nav class="app-header__nav">
-            <%= link_to "Documents", documents_path, class: "app-header__link" %>
-            <%= link_to "Tags", tags_path, class: "app-header__link" %>
-            <%= link_to "API tokens", settings_api_tokens_path, class: "app-header__link" %>
-            <%= button_to "Sign out", sign_out_path, method: :delete, class: "app-header__signout" %>
-          </nav>
-        </div>
-      </header>
+      <%= render "layouts/sidebar" %>
+      <main class="app-main"><%= yield %></main>
+    <% else %>
+      <main class="app-main app-main--plain"><%= yield %></main>
     <% end %>
-
-    <main class="app-main">
-      <%= yield %>
-    </main>
   </body>
 </html>

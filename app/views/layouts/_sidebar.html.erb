@@ -1,0 +1,60 @@
+<%
+  current_doc_id = (@document.is_a?(Document) ? @document.id : nil)
+  recent_docs = Current.user.documents.order(updated_at: :desc).limit(20)
+  total_docs = Current.user.documents.count
+  tag_counts = Current.user.documents
+    .where("array_length(tags, 1) > 0")
+    .pluck(:tags)
+    .flatten
+    .tally
+    .sort_by { |_, c| [ -c, _ ] }
+    .first(10)
+%>
+
+<aside class="app-sidebar">
+  <div class="app-sidebar__top">
+    <%= link_to "Clearwriter", documents_path, class: "app-sidebar__brand" %>
+    <%= button_to "+", documents_path, method: :post, class: "app-sidebar__new", title: "New document", "aria-label": "New document" %>
+  </div>
+
+  <section class="app-sidebar__section">
+    <div class="app-sidebar__label">Recent</div>
+    <% if recent_docs.empty? %>
+      <p class="app-sidebar__empty">No documents yet.</p>
+    <% else %>
+      <ul class="app-sidebar__list">
+        <% recent_docs.each do |doc| %>
+          <li>
+            <%= link_to edit_document_path(doc), class: "app-sidebar__item #{'app-sidebar__item--active' if doc.id == current_doc_id}" do %>
+              <span class="app-sidebar__item-title <%= 'app-sidebar__item-title--untitled' if doc.title.blank? %>"><%= doc.title.presence || "Untitled" %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <% if total_docs > recent_docs.size %>
+        <%= link_to "All documents →", documents_path(since: "all"), class: "app-sidebar__more" %>
+      <% end %>
+    <% end %>
+  </section>
+
+  <% if tag_counts.any? %>
+    <section class="app-sidebar__section">
+      <div class="app-sidebar__label">Tags</div>
+      <ul class="app-sidebar__list">
+        <% tag_counts.each do |tag, count| %>
+          <li>
+            <%= link_to documents_path(tag: tag, since: "all"), class: "app-sidebar__tag" do %>
+              <span class="app-sidebar__tag-name">#<%= tag %></span>
+              <span class="app-sidebar__tag-count"><%= count %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+
+  <nav class="app-sidebar__bottom">
+    <%= link_to "Settings", settings_api_tokens_path, class: "app-sidebar__bottom-link" %>
+    <%= button_to "Sign out", sign_out_path, method: :delete, class: "app-sidebar__bottom-link app-sidebar__signout" %>
+  </nav>
+</aside>
