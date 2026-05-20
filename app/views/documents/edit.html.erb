@@ -1,22 +1,27 @@
-<div class="mx-auto max-w-2xl w-full px-4 py-8">
+<div data-controller="editor"
+     data-editor-url-value="<%= document_path(@document) %>"
+     class="mx-auto max-w-2xl w-full px-4 py-8">
+
   <div class="flex items-center justify-between mb-6 text-sm text-gray-500">
     <%= link_to "← All documents", documents_path, class: "hover:underline" %>
-    <span>Saved <%= time_ago_in_words(@document.updated_at) %> ago</span>
+    <span data-editor-target="status">Saved</span>
   </div>
 
   <%= form_with model: @document, class: "contents" do |form| %>
     <%= form.text_field :title,
           placeholder: "Title",
+          data: { editor_target: "title" },
           class: "block w-full text-3xl font-bold border-0 focus:outline-none mb-4 bg-transparent placeholder:text-gray-300" %>
 
-    <div data-controller="editor" class="editor-host border border-gray-200 rounded-md p-4 min-h-[24rem] focus-within:border-blue-400">
+    <div class="editor-host border border-gray-200 rounded-md p-4 min-h-[24rem] focus-within:border-blue-400">
       <%= form.text_area :body,
             rows: 24,
             data: { editor_target: "textarea" },
             class: "block w-full font-mono text-base border-0 focus:outline-none bg-transparent resize-none" %>
     </div>
 
-    <div class="mt-4 flex justify-end">
+    <%# Manual Save is the no-JS fallback; the editor controller hides it on connect. %>
+    <div class="mt-4 flex justify-end" data-editor-target="fallbackSave">
       <%= form.submit "Save", class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
     </div>
   <% end %>
