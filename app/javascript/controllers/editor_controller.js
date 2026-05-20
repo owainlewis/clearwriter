@@ -80,9 +80,11 @@ export default class extends Controller {
       ]
     })
 
+    // Mount CodeMirror inside editorPane so the preview toggle can hide
+    // both the textarea and the editor by toggling a single ancestor.
     this.view = new EditorView({
       state: startState,
-      parent: this.element
+      parent: this.hasEditorPaneTarget ? this.editorPaneTarget : this.element
     })
 
     if (this.hasTitleTarget) {
