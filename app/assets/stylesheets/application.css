@@ -252,8 +252,11 @@ button, input, textarea, select { font: inherit; color: inherit; }
   align-items: baseline;
   justify-content: space-between;
   gap: 24px;
-  padding: 16px 4px;
+  padding: 12px 16px;
+  margin: 4px -16px;     /* extend hover past content edge horizontally; breathing room above/below so hover doesn't touch the divider */
+  border-radius: 6px;
   color: inherit;
+  transition: background 120ms ease;
 }
 .cw-doc-list__row:hover {
   background: var(--cw-line-soft);
@@ -290,9 +293,40 @@ button, input, textarea, select { font: inherit; color: inherit; }
   font-size: 0.85rem;
   color: var(--cw-muted);
 }
-.cw-editor__bar-right { display: flex; align-items: center; gap: 16px; }
-.cw-editor__shortcut { color: var(--cw-faint); font-size: 0.78rem; }
-.cw-editor__status { color: var(--cw-muted); }
+.cw-editor__bar-spacer { flex: 1; } /* keeps right cluster anchored even when left is empty */
+.cw-editor__bar-right { display: flex; align-items: center; gap: 10px; }
+
+/* Tiny coloured status dot. Title attribute carries the full "Saved at HH:MM" hover. */
+.cw-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;          /* saved */
+  flex-shrink: 0;
+  transition: background 180ms ease;
+  display: inline-block;
+}
+.cw-status-dot[data-state="saving"] {
+  background: #f59e0b;          /* amber */
+  animation: cw-pulse 1.2s ease-in-out infinite;
+}
+.cw-status-dot[data-state="error"] {
+  background: #ef4444;          /* red */
+}
+@keyframes cw-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.82); }
+}
+
+/* Subtle footer beneath the editor — word count, anchored bottom-right. */
+.cw-editor__footer {
+  margin-top: 28px;
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--cw-faint);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
 
 /* Quiet actions menu — native <details> for no-JS popover. */
 .cw-menu { position: relative; }
