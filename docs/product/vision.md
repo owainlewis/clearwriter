@@ -149,7 +149,36 @@ Ordered roughly by likely build sequence. Each item is a hypothesis, not a commi
 - **Expiring share links** (`public_until` timestamp) — solves "I gave an agent access for one task."
 - **Per-doc API tokens** — give an agent access to one doc, not the whole vault.
 
-### v1.2 — Collections (content bundles)
+### v1.2 — Templates
+
+A **Template** is a markdown document that other users (or the same user) can clone as a starting point for a new document. Examples:
+
+- "YouTube video launch checklist" — a checklist of pre-record, record, edit, publish steps.
+- "SOP template" — sections for purpose, scope, procedure, owner, last reviewed.
+- "Newsletter outline" — hook, body, three takeaways, CTA.
+- "Bug triage script" — questions an on-call engineer should walk through.
+
+Mechanics:
+
+- Any document can be marked as a template (flag on Document, or a separate Template model — decide before building).
+- "Use this template" → new Document seeded with the template's body and tags.
+- Templates have their own public URL so they're shareable like any other doc.
+- A user's own template library (`/templates`) lists everything they've created or starred.
+
+Why this is on the agent-native roadmap, not just a generic-SaaS feature:
+
+- A template is just markdown — fits the storage model exactly, no new primitive.
+- **Agents can work through a template *with* the user**: agent fetches the template, walks the user through each section or checkbox, fills in answers, and saves the result as a new document. This is exactly the kind of structured-but-flexible workflow the agent-native positioning is built for.
+- Public templates become marketing: every "Use this template" link is a share + a signup funnel.
+- Optional later: community gallery of public templates (curated, voted on, etc.).
+
+Open design questions:
+
+- Template-as-flag vs template-as-its-own-type. Leaning flag (\`is_template: true\`) — same storage, same API, lower complexity.
+- Does cloning copy tags? Author? Frontmatter? Default: copy body + tags, drop frontmatter author fields.
+- How does an agent know "this is a template, walk me through it"? Probably a frontmatter convention (\`type: template\`) + an MCP/API hint.
+
+### v1.3 — Collections (content bundles)
 
 A **Collection** is an ordered, named set of documents — many-to-many with `Document`. Two use cases drive this:
 
@@ -166,7 +195,7 @@ Open design questions to resolve before building:
 - Collection sharing scope: share the collection (one URL → TOC), or auto-share each doc? Probably: collection sharing implies the docs inside become public via collection-scoped tokens.
 - API shape: `GET /api/v1/collections/:id` returns ordered list of doc metadata; `GET /api/v1/collections/:id/bundle.md` returns concatenated markdown with separators (for agents who want one blob).
 
-### v1.3+ — Distribution
+### v1.4+ — Distribution
 
 - **Public user index** at `/u/:username` — a person's published docs and collections in one place.
 - **Custom subdomain** for share links (`yourname.clearwriter.app/d/...`).
