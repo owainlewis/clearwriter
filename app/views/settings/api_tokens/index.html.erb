@@ -1,52 +1,53 @@
-<div class="mx-auto md:w-2/3 w-full py-8">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="font-bold text-3xl">API tokens</h1>
-    <%= link_to "← Documents", documents_path, class: "text-sm text-gray-600 hover:underline" %>
+<div class="cw-page">
+  <div class="cw-page__header">
+    <h1 class="cw-page__title">API tokens</h1>
+    <%= link_to "← Documents", documents_path %>
   </div>
 
   <% if notice = flash[:notice] %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block"><%= notice %></p>
+    <p class="cw-flash cw-flash--notice"><%= notice %></p>
   <% end %>
 
   <% if @new_token %>
-    <div class="mb-6 p-4 border border-yellow-300 bg-yellow-50 rounded-md">
-      <p class="text-sm text-yellow-900 mb-2 font-medium">Copy this token now — it won't be shown again.</p>
-      <code class="block break-all bg-white border border-yellow-200 rounded px-3 py-2 text-sm"><%= @new_token %></code>
+    <div class="cw-token-banner">
+      <p style="margin: 0 0 4px; font-weight: 500;">Copy this token now — it won't be shown again.</p>
+      <code class="cw-token-banner__code"><%= @new_token %></code>
     </div>
   <% end %>
 
-  <%= form_with url: settings_api_tokens_path, method: :post, class: "flex gap-2 mb-6" do |form| %>
-    <%= form.text_field :name, placeholder: "Token name (optional)",
-          class: "flex-1 shadow-sm rounded-md border border-gray-300 focus:outline-blue-600 px-3 py-2" %>
-    <%= form.submit "Create token",
-          class: "rounded-md px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+  <%= form_with url: settings_api_tokens_path, method: :post, class: "cw-token-form" do |form| %>
+    <%= form.text_field :name, placeholder: "Token name (optional)", class: "cw-token-form__input" %>
+    <%= form.submit "Create token", class: "cw-btn cw-btn--primary" %>
   <% end %>
 
   <% if @api_tokens.empty? %>
-    <p class="text-gray-500">No tokens yet.</p>
+    <p class="cw-empty">No tokens yet.</p>
   <% else %>
-    <ul class="divide-y divide-gray-200 border border-gray-200 rounded-md">
+    <ul class="cw-token-list">
       <% @api_tokens.each do |token| %>
-        <li class="flex items-center justify-between p-3">
+        <li class="cw-token-list__item">
           <div>
-            <div class="font-medium text-gray-900"><%= token.name.presence || "Unnamed" %></div>
-            <div class="text-xs text-gray-500">
+            <div class="cw-token-list__name"><%= token.name.presence || "Unnamed" %></div>
+            <div class="cw-token-list__meta">
               Created <%= token.created_at.strftime("%b %-d, %Y") %>
               <% if token.last_used_at %>· last used <%= time_ago_in_words(token.last_used_at) %> ago<% end %>
             </div>
           </div>
           <%= button_to "Revoke", settings_api_token_path(token), method: :delete,
                 data: { turbo_confirm: "Revoke this token?" },
-                class: "text-sm text-red-600 hover:underline bg-transparent border-0 cursor-pointer" %>
+                class: "cw-btn cw-btn--danger" %>
         </li>
       <% end %>
     </ul>
   <% end %>
 
-  <div class="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700">
-    <p class="font-medium mb-2">Using your token</p>
-<pre class="whitespace-pre-wrap">curl -H "Authorization: Bearer cw_..." https://clearwriter.app/api/v1/documents
-curl -X PUT -H "Authorization: Bearer cw_..." -H "Content-Type: text/markdown" \
-  --data-binary @notes.md https://clearwriter.app/api/v1/documents/&lt;token&gt;/content</pre>
+  <div class="cw-curl">
+    <div class="cw-curl__label">Using your token</div>
+<pre>curl -H "Authorization: Bearer cw_..." https://clearwriter.app/api/v1/documents
+
+curl -X PUT -H "Authorization: Bearer cw_..." \
+  -H "Content-Type: text/markdown" \
+  --data-binary @notes.md \
+  https://clearwriter.app/api/v1/documents/&lt;token&gt;/content</pre>
   </div>
 </div>

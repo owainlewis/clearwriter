@@ -1,19 +1,18 @@
-<div class="mx-auto md:w-2/3 w-full py-8">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="font-bold text-3xl">Tags</h1>
-    <%= link_to "← Documents", documents_path, class: "text-sm text-gray-600 hover:underline" %>
+<div class="cw-page">
+  <div class="cw-page__header">
+    <h1 class="cw-page__title">Tags</h1>
+    <%= link_to "← Documents", documents_path %>
   </div>
 
   <% if @tag_counts.empty? %>
-    <p class="text-gray-500">No tags yet. Add tags on a document to organise.</p>
+    <p class="cw-empty">No tags yet. Add tags on a document to organise.</p>
   <% else %>
-    <ul class="flex flex-wrap gap-2">
+    <ul class="cw-tag-cloud">
       <% @tag_counts.each do |tag, count| %>
         <li>
-          <%= link_to documents_path(tag: tag, since: "all"),
-                class: "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-300 text-gray-700 hover:border-gray-500" do %>
+          <%= link_to documents_path(tag: tag, since: "all"), class: "cw-tag-cloud__item" do %>
             <span><%= tag %></span>
-            <span class="text-xs text-gray-500"><%= count %></span>
+            <span class="cw-tag-cloud__count"><%= count %></span>
           <% end %>
         </li>
       <% end %>

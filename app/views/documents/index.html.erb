@@ -1,58 +1,48 @@
-<div class="mx-auto md:w-2/3 w-full py-8">
+<div class="cw-page cw-page--wide">
   <% if notice = flash[:notice] %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-700 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+    <p class="cw-flash cw-flash--notice"><%= notice %></p>
   <% end %>
 
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="font-bold text-3xl">Documents</h1>
-    <div class="flex items-center gap-3">
-      <%= link_to "API tokens", settings_api_tokens_path, class: "text-sm text-gray-600 hover:underline" %>
-      <%= button_to "New document", documents_path, method: :post,
-            class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
-    </div>
+  <div class="cw-page__header">
+    <h1 class="cw-page__title">Documents</h1>
+    <%= button_to "New document", documents_path, method: :post, class: "cw-btn cw-btn--primary" %>
   </div>
 
-  <%# Filters: time range + tag. %>
   <% current_since = params[:since].presence || "7d" %>
-  <nav class="flex items-center flex-wrap gap-2 mb-4 text-sm">
+  <nav class="cw-filters">
     <% [["7d", "Last 7 days"], ["30d", "Last 30 days"], ["all", "All"]].each do |val, label| %>
       <% active = current_since == val %>
       <%= link_to label, documents_path(since: val, tag: @tag),
-            class: "px-3 py-1 rounded-full border #{active ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'}" %>
+            class: "cw-chip #{'cw-chip--active' if active}" %>
     <% end %>
-
     <% if @tag %>
-      <span class="ml-2 text-gray-500">Tag:</span>
-      <%= link_to "#{@tag} ✕", documents_path(since: current_since),
-            class: "px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100" %>
+      <span style="margin-left: 8px; color: var(--cw-muted);">Tag:</span>
+      <%= link_to "#{@tag} ✕", documents_path(since: current_since), class: "cw-chip cw-chip--active" %>
     <% end %>
-
-    <span class="ml-auto"><%= link_to "Browse tags →", tags_path, class: "text-blue-700 hover:underline" %></span>
   </nav>
 
   <% if @documents.empty? %>
-    <p class="text-gray-500 py-8">No documents in this view. Try “All” or create one.</p>
+    <p class="cw-empty">No documents in this view. Try “All” or create one.</p>
   <% else %>
-    <ul class="divide-y divide-gray-200">
+    <ul class="cw-doc-list">
       <% @documents.each do |document| %>
-        <li class="py-3 flex items-center justify-between gap-4">
-          <div class="min-w-0 flex-1">
+        <li class="cw-doc-list__item">
+          <div class="cw-doc-list__main">
             <%= link_to (document.title.presence || "Untitled"), edit_document_path(document),
-                  class: "text-blue-700 hover:underline truncate block" %>
+                  class: "cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}" %>
             <% if document.tags.any? %>
-              <div class="mt-1 flex flex-wrap gap-1">
+              <div class="cw-doc-list__tags">
                 <% document.tags.each do |t| %>
-                  <%= link_to t, documents_path(tag: t, since: current_since),
-                        class: "text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200" %>
+                  <%= link_to t, documents_path(tag: t, since: current_since), class: "cw-chip cw-chip--tag" %>
                 <% end %>
               </div>
             <% end %>
           </div>
-          <div class="flex items-center gap-4 shrink-0">
-            <span class="text-sm text-gray-400 hidden sm:inline"><%= document.updated_at.strftime("%b %-d") %></span>
+          <div class="cw-doc-list__meta">
+            <span><%= document.updated_at.strftime("%b %-d") %></span>
             <%= button_to "Delete", document_path(document), method: :delete,
                   data: { turbo_confirm: "Delete this document?" },
-                  class: "text-sm text-red-600 hover:underline bg-transparent border-0 cursor-pointer" %>
+                  class: "cw-btn cw-btn--danger" %>
           </div>
         </li>
       <% end %>
