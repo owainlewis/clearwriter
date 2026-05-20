@@ -245,26 +245,32 @@ button, input, textarea, select { font: inherit; color: inherit; }
   border-top: 1px solid var(--cw-line);
 }
 .cw-doc-list__item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 0;
   border-bottom: 1px solid var(--cw-line);
 }
-.cw-doc-list__main { min-width: 0; flex: 1; }
+.cw-doc-list__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 4px;
+  color: inherit;
+}
+.cw-doc-list__row:hover {
+  background: var(--cw-line-soft);
+  text-decoration: none;
+}
 .cw-doc-list__title {
   font-family: var(--cw-font-prose);
   font-size: 1.05rem;
   color: var(--cw-ink);
-  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
-.cw-doc-list__title:hover { color: var(--cw-link); text-decoration: none; }
 .cw-doc-list__title--untitled { color: var(--cw-faint); font-style: italic; }
-.cw-doc-list__tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-.cw-doc-list__meta { display: flex; align-items: center; gap: 14px; color: var(--cw-muted); font-size: 0.85rem; flex-shrink: 0; }
+.cw-doc-list__date { color: var(--cw-muted); font-size: 0.85rem; flex-shrink: 0; }
 .cw-empty { color: var(--cw-muted); padding: 40px 0; }
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -288,30 +294,86 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .cw-editor__shortcut { color: var(--cw-faint); font-size: 0.78rem; }
 .cw-editor__status { color: var(--cw-muted); }
 
-.cw-share {
-  display: flex;
+/* Quiet actions menu — native <details> for no-JS popover. */
+.cw-menu { position: relative; }
+.cw-menu__trigger {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--cw-muted);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+}
+.cw-menu__trigger::-webkit-details-marker { display: none; }
+.cw-menu__trigger::marker { content: ""; }
+.cw-menu__trigger:hover { background: var(--cw-line-soft); color: var(--cw-ink); }
+.cw-menu[open] .cw-menu__trigger { background: var(--cw-line-soft); color: var(--cw-ink); }
+.cw-menu__panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 180px;
+  padding: 4px;
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px -10px rgba(0,0,0,0.12);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.cw-menu__item {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: var(--cw-ink-soft);
+}
+.cw-menu__item:hover { background: var(--cw-line-soft); color: var(--cw-ink); }
+.cw-menu__item--danger { color: #b91c1c; }
+.cw-menu__item--danger:hover { background: #fef2f2; color: #991b1b; }
+
+/* Public-URL line — appears just below the editor bar when shared. */
+.cw-public-url {
+  display: flex;
+  align-items: baseline;
   gap: 12px;
   margin-bottom: 24px;
-  padding: 10px 14px;
-  border: 1px solid var(--cw-line);
-  border-radius: 6px;
-  font-size: 0.88rem;
-  background: var(--cw-surface);
+  font-size: 0.82rem;
+  color: var(--cw-muted);
 }
-.cw-share__url {
-  color: var(--cw-link);
+.cw-public-url__label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #047857;
+}
+.cw-public-url__link {
   font-family: var(--cw-font-mono);
-  font-size: 0.85rem;
+  color: var(--cw-ink-soft);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
   min-width: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
 }
-.cw-share__state { color: #047857; font-weight: 500; margin-right: 8px; }
-.cw-share__state--private { color: var(--cw-muted); font-weight: 400; }
+.cw-public-url__link:hover { color: var(--cw-link); text-decoration: none; }
+.cw-public-url__arrow { font-size: 0.75rem; opacity: 0.6; }
 
 .cw-editor__title {
   display: block;
