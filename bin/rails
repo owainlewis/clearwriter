@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+homebrew_ruby = "/opt/homebrew/opt/ruby/bin/ruby"
+if RUBY_VERSION.start_with?("2.") && File.executable?(homebrew_ruby) && ENV["CLEARWRITER_RUBY_REEXEC"] != "1"
+  ENV["CLEARWRITER_RUBY_REEXEC"] = "1"
+  exec homebrew_ruby, $PROGRAM_NAME, *ARGV
+end
+
 APP_PATH = File.expand_path("../config/application", __dir__)
 require_relative "../config/boot"
 require "rails/commands"

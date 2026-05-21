@@ -1,4 +1,4 @@
-<div data-controller="editor"
+<div data-controller="editor copy-markdown"
      data-editor-url-value="<%= document_path(@document) %>"
      data-editor-preview-url-value="<%= preview_document_path(@document) %>"
      class="cw-editor">
@@ -16,6 +16,11 @@
       <details class="cw-menu">
         <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
         <div class="cw-menu__panel" role="menu">
+          <button type="button"
+                  class="cw-menu__item"
+                  data-action="copy-markdown#copy">
+            Copy as Markdown
+          </button>
           <% if @document.is_public %>
             <div class="cw-menu__readout">
               <div class="cw-menu__readout-label">Public link</div>
@@ -42,7 +47,7 @@
     <div data-editor-target="editorPane" class="cw-editor__host">
       <%= form.text_area :body,
             rows: 24,
-            data: { editor_target: "textarea" },
+            data: { editor_target: "textarea", copy_markdown_target: "source" },
             placeholder: "# Start with a heading…" %>
     </div>
 

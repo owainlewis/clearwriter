@@ -1,4 +1,21 @@
-<div class="cw-page">
+<div class="cw-page"
+     data-controller="copy-markdown"
+     data-copy-markdown-url-value="<%= public_document_path(@document.public_token, format: :md) %>">
+  <div class="cw-editor__bar">
+    <span class="cw-editor__bar-spacer"></span>
+
+    <details class="cw-menu">
+      <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
+      <div class="cw-menu__panel" role="menu">
+        <button type="button"
+                class="cw-menu__item"
+                data-action="copy-markdown#copy">
+          Copy as Markdown
+        </button>
+      </div>
+    </details>
+  </div>
+
   <article class="preview-host">
     <%= ClearwriterMarkdown.render(@document.body) %>
   </article>
