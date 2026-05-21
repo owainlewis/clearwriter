@@ -33,10 +33,12 @@ export default class extends Controller {
     }
   }
 
-  // ⌘\ (or Ctrl+\ on non-Mac). Notion / Linear convention.
+  // ⌘1 or ⌘\ (or Ctrl+ on non-Mac). Both bound — ⌘1 is the primary user-facing
+  // shortcut; ⌘\ stays as the Notion/Linear-convention alternate.
   onKeydown(event) {
-    if (event.key !== "\\") return
     if (!(event.metaKey || event.ctrlKey)) return
+    if (event.shiftKey || event.altKey) return
+    if (event.key !== "1" && event.key !== "\\") return
     event.preventDefault()
     this.toggle(event)
   }
@@ -54,7 +56,7 @@ export default class extends Controller {
     if (!this.hasToggleTarget || !this.shell) return
     const collapsed = this.shell.classList.contains("app-shell--collapsed")
     const mac = navigator.platform.toLowerCase().includes("mac")
-    const hint = mac ? "⌘\\" : "Ctrl+\\"
+    const hint = mac ? "⌘1" : "Ctrl+1"
     this.toggleTarget.setAttribute("aria-expanded", collapsed ? "false" : "true")
     this.toggleTarget.setAttribute("title", `${collapsed ? "Show sidebar" : "Hide sidebar"} (${hint})`)
   }
