@@ -570,17 +570,75 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 }
 .cw-editor__title::placeholder { color: var(--cw-faint); font-weight: 600; }
 
-.cw-editor__tags {
-  display: block;
-  width: 100%;
-  border: 0;
-  background: transparent;
-  font-size: 0.85rem;
-  color: var(--cw-muted);
-  outline: none;
-  margin-bottom: 28px;
+/* Editor footer (metadata that's not the writing itself). */
+.cw-editor__meta {
+  margin-top: 36px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cw-line);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  cursor: text;
 }
-.cw-editor__tags::placeholder { color: var(--cw-faint); }
+.cw-chips__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  color: var(--cw-faint);
+  margin-right: 4px;
+  user-select: none;
+}
+.cw-chips__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cw-chips__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 9px;
+  border-radius: 999px;
+  background: var(--cw-line-soft);
+  color: var(--cw-ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.cw-chips__chip-label { font-family: var(--cw-font-mono); }
+.cw-chips__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  color: var(--cw-muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+.cw-chips__chip-remove:hover { background: rgba(0,0,0,0.06); color: var(--cw-ink); }
+.cw-chips__input {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.85rem;
+  color: var(--cw-ink);
+  padding: 2px 4px;
+}
+.cw-chips__input::placeholder { color: var(--cw-faint); }
 
 .cw-editor__host {
   border: none;

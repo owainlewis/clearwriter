@@ -39,12 +39,6 @@
   </div>
 
   <%= form_with model: @document, class: "contents" do |form| %>
-    <%= form.text_field :tags_text,
-          placeholder: "tags, comma, separated",
-          value: @document.tags_text,
-          data: { editor_target: "tags" },
-          class: "cw-editor__tags" %>
-
     <div data-editor-target="editorPane" class="cw-editor__host">
       <%= form.text_area :body,
             rows: 24,
@@ -53,6 +47,22 @@
     </div>
 
     <div data-editor-target="previewPane" class="preview-host hidden"></div>
+
+    <footer class="cw-editor__meta"
+            data-controller="tag-chips"
+            data-action="click->tag-chips#focusInput">
+      <span class="cw-chips__label">Tags</span>
+      <ul class="cw-chips__list" data-tag-chips-target="list"></ul>
+      <input type="text"
+             class="cw-chips__input"
+             data-tag-chips-target="input"
+             data-action="keydown->tag-chips#onKey blur->tag-chips#onBlur"
+             placeholder="Add tag…"
+             autocomplete="off">
+      <%= form.hidden_field :tags_text,
+            value: @document.tags_text,
+            data: { tag_chips_target: "hidden", editor_target: "tags" } %>
+    </footer>
 
     <%# Manual Save is the no-JS fallback; the editor controller hides it on connect. %>
     <div style="margin-top: 16px; display: flex; justify-content: flex-end;" data-editor-target="fallbackSave">
