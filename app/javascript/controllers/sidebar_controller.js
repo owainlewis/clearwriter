@@ -21,10 +21,28 @@ export default class extends Controller {
       this.shell.classList.add("app-shell--collapsed")
     }
     this.syncToggleLabel()
+
+    this.boundKeydown = this.onKeydown.bind(this)
+    window.addEventListener("keydown", this.boundKeydown)
+  }
+
+  disconnect() {
+    if (this.boundKeydown) {
+      window.removeEventListener("keydown", this.boundKeydown)
+      this.boundKeydown = null
+    }
+  }
+
+  // ⌘\ (or Ctrl+\ on non-Mac). Notion / Linear convention.
+  onKeydown(event) {
+    if (event.key !== "\\") return
+    if (!(event.metaKey || event.ctrlKey)) return
+    event.preventDefault()
+    this.toggle(event)
   }
 
   toggle(event) {
-    event.preventDefault()
+    if (event && typeof event.preventDefault === "function") event.preventDefault()
     if (!this.shell) return
 
     const collapsed = this.shell.classList.toggle("app-shell--collapsed")
@@ -35,8 +53,10 @@ export default class extends Controller {
   syncToggleLabel() {
     if (!this.hasToggleTarget || !this.shell) return
     const collapsed = this.shell.classList.contains("app-shell--collapsed")
+    const mac = navigator.platform.toLowerCase().includes("mac")
+    const hint = mac ? "⌘\\" : "Ctrl+\\"
     this.toggleTarget.setAttribute("aria-expanded", collapsed ? "false" : "true")
-    this.toggleTarget.setAttribute("title", collapsed ? "Show sidebar" : "Hide sidebar")
+    this.toggleTarget.setAttribute("title", `${collapsed ? "Show sidebar" : "Hide sidebar"} (${hint})`)
   }
 
   readPersisted() {
