@@ -1,0 +1,2 @@
+# API tokens are created via ApiToken.create_for_user! in tests so we can
+# capture the raw token (only the digest is persisted).
