@@ -676,6 +676,52 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .preview-host p  { margin: 0.85rem 0; }
 .preview-host ul, .preview-host ol { margin: 0.85rem 0 0.85rem 1.5rem; }
 .preview-host li { margin: 0.3rem 0; }
+
+/* GFM task-list items — \`- [ ]\` and \`- [x]\`.
+ * commonmarker emits a disabled <input type="checkbox"> inside the <li>.
+ * Drop the bullet, indent so the checkbox sits where the bullet would be,
+ * and restyle the checkbox itself to feel deliberate. */
+.preview-host li:has(> input[type="checkbox"]) {
+  list-style: none;
+  margin-left: -1.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.preview-host input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--cw-muted);
+  border-radius: 3px;
+  background: var(--cw-surface);
+  position: relative;
+  top: 2px;          /* nudge to sit on the text baseline */
+  flex-shrink: 0;
+  cursor: default;   /* preview is read-only */
+  opacity: 1;        /* override browser-disabled fade */
+}
+.preview-host input[type="checkbox"]:checked {
+  background: var(--cw-ink);
+  border-color: var(--cw-ink);
+}
+.preview-host input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.preview-host li:has(> input[type="checkbox"]:checked) {
+  color: var(--cw-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--cw-faint);
+}
 .preview-host a  { color: var(--cw-link); text-decoration: underline; text-underline-offset: 2px; }
 .preview-host strong { font-weight: 700; }
 .preview-host em { font-style: italic; }
