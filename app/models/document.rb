@@ -30,7 +30,7 @@ class Document < ApplicationRecord
   def tags_text=(value)
     self.tags = value.to_s
       .split(",")
-      .map { |t| t.strip.downcase }
+      .map { |t| t.strip.downcase.delete_prefix("#") }
       .reject(&:blank?)
       .uniq
   end
