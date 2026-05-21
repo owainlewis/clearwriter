@@ -16,6 +16,17 @@
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <%# Apply persisted sidebar-collapsed class before paint to avoid a flash. %>
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("cw:sidebar-collapsed") === "1") {
+            document.documentElement.classList.add("app-shell-collapsed-boot");
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body class="<%= authenticated? ? 'app-shell' : 'app-shell--plain' %>">
