@@ -40,6 +40,22 @@ class Api::DocumentsApiTest < ActionDispatch::IntegrationTest
     assert_equal 1, JSON.parse(response.body).size
   end
 
+  test "GET /api/v1/documents?q= searches title and body" do
+    @alice.documents.create!(body: "# Billing\nwebhook retry logic")
+    @alice.documents.create!(body: "# Unrelated note")
+
+    get "/api/v1/documents", params: { q: "webhook" }, headers: auth_headers
+    results = JSON.parse(response.body)
+    assert_equal 1, results.size
+    assert_equal "Billing", results[0]["title"]
+  end
+
+  test "search is scoped to the current user" do
+    @bob.documents.create!(body: "# Bob secret webhook")
+    get "/api/v1/documents", params: { q: "webhook" }, headers: auth_headers
+    assert_equal 0, JSON.parse(response.body).size
+  end
+
   test "POST /api/v1/documents creates" do
     assert_difference -> { @alice.documents.count }, 1 do
       post "/api/v1/documents",

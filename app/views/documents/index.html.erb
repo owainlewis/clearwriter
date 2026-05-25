@@ -29,7 +29,7 @@
         <li class="cw-doc-list__item">
           <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
             <span class="cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}">
-              <%= document.title.presence || "Untitled" %>
+              <%= icon :document, class: "cw-doc-list__icon" %> <%= document.title.presence || "Untitled" %>
             </span>
             <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
           <% end %>

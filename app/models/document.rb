@@ -1,24 +1,30 @@
 class Document < ApplicationRecord
-  PUBLIC_TOKEN_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".chars.freeze
-  PUBLIC_TOKEN_LENGTH = 22
+  include HasPublicToken
+
   MAX_BODY_BYTES = 5.megabytes
 
   TITLE_FALLBACK_LIMIT = 80
 
   belongs_to :user
+  has_many :collection_documents, dependent: :destroy
+  has_many :collections, through: :collection_documents
+  has_many :task_documents, dependent: :destroy
+  has_many :tasks, through: :task_documents
 
-  before_validation :assign_public_token, on: :create
   before_save :derive_title_from_body
 
-  validates :public_token, presence: true, uniqueness: true
   validate :body_within_byte_limit
 
   scope :public_docs, -> { where(is_public: true) }
   scope :with_tag, ->(tag) { where("tags @> ARRAY[?]::varchar[]", tag) }
   scope :updated_since, ->(time) { where("updated_at >= ?", time) }
 
-  def to_param
-    public_token
+  # Substring search over title and body. ILIKE is the deliberate v1 choice:
+  # no migration, good enough for an agent finding a doc by a phrase it
+  # remembers. Upgrade path is a tsvector column + GIN index if ranking matters.
+  def self.search(query)
+    pattern = "%#{sanitize_sql_like(query.to_s.strip)}%"
+    where("title ILIKE :q OR body ILIKE :q", q: pattern)
   end
 
   # Virtual attribute so the edit-page chip input can be a single text field.
@@ -36,18 +42,6 @@ class Document < ApplicationRecord
   end
 
   private
-
-  def assign_public_token
-    return if public_token.present?
-
-    loop do
-      candidate = Array.new(PUBLIC_TOKEN_LENGTH) { PUBLIC_TOKEN_ALPHABET.sample(random: SecureRandom) }.join
-      next if Document.exists?(public_token: candidate)
-
-      self.public_token = candidate
-      break
-    end
-  end
 
   def body_within_byte_limit
     return if body.nil?

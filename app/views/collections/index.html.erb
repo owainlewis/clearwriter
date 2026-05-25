@@ -1,0 +1,36 @@
+<div class="cw-page cw-page--wide" data-controller="reveal" data-action="keydown@window->reveal#close">
+  <% if notice = flash[:notice] %>
+    <p class="cw-flash cw-flash--notice"><%= notice %></p>
+  <% end %>
+
+  <div class="cw-page__header">
+    <h1 class="cw-page__title">Collections</h1>
+    <button type="button" class="cw-btn cw-btn--primary"
+            data-reveal-target="trigger" data-action="reveal#toggle">
+      <%= icon :plus %> New collection
+    </button>
+  </div>
+
+  <%= form_with url: collections_path, scope: :collection, method: :post,
+        class: "cw-form-card cw-hidden", data: { reveal_target: "panel" } do |f| %>
+    <%= f.text_field :name, placeholder: "Collection name…", class: "cw-input",
+          required: true, data: { reveal_target: "field" } %>
+    <%= f.submit "Create", class: "cw-btn cw-btn--primary" %>
+    <button type="button" class="cw-btn cw-btn--ghost" data-action="reveal#toggle">Cancel</button>
+  <% end %>
+
+  <% if @collections.empty? %>
+    <p class="cw-empty">No collections yet. Create one to group related documents.</p>
+  <% else %>
+    <ul class="cw-doc-list">
+      <% @collections.each do |collection| %>
+        <li class="cw-doc-list__item">
+          <%= link_to collection_path(collection), class: "cw-doc-list__row" do %>
+            <span class="cw-doc-list__title"><%= icon :collection, class: "cw-doc-list__icon" %> <%= collection.display_name %></span>
+            <span class="cw-doc-list__date"><%= pluralize(collection.documents.size, "doc") %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

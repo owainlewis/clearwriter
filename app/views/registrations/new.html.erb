@@ -1,28 +1,36 @@
 <div class="cw-auth">
-  <% if alert = flash[:alert] %>
-    <p class="cw-flash cw-flash--alert"><%= alert %></p>
-  <% end %>
-
-  <h1 class="cw-auth__title">Create your account</h1>
-
-  <%= form_with model: @user, url: registration_path, scope: :user, class: "contents" do |form| %>
-    <% if @user.errors.any? %>
-      <div class="cw-flash cw-flash--alert" style="display: block;">
-        <ul style="margin: 0; padding-left: 1.2rem;">
-          <% @user.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
+  <div class="cw-auth__inner">
+    <%= link_to root_path, class: "cw-auth__brand" do %>
+      <span class="cw-auth__brand-mark"></span> Atrium
     <% end %>
 
-    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", class: "cw-auth__field" %>
-    <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Password", maxlength: 72, class: "cw-auth__field" %>
-    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Confirm password", maxlength: 72, class: "cw-auth__field" %>
-    <%= form.submit "Sign up", class: "cw-btn cw-btn--primary cw-auth__submit" %>
-  <% end %>
+    <div class="cw-auth__card">
+      <% if alert = flash[:alert] %>
+        <p class="cw-flash cw-flash--alert"><%= alert %></p>
+      <% end %>
 
-  <div class="cw-auth__links">
-    Already have an account?&nbsp;<%= link_to "Sign in", new_session_path %>
+      <h1 class="cw-auth__title">Create your account</h1>
+
+      <%= form_with model: @user, url: registration_path, scope: :user, class: "contents" do |form| %>
+        <% if @user.errors.any? %>
+          <div class="cw-flash cw-flash--alert" style="display: block;">
+            <ul style="margin: 0; padding-left: 1.2rem;">
+              <% @user.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", class: "cw-auth__field" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Password", maxlength: 72, class: "cw-auth__field" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Confirm password", maxlength: 72, class: "cw-auth__field" %>
+        <%= form.submit "Sign up", class: "cw-btn cw-btn--primary cw-auth__submit" %>
+      <% end %>
+
+      <div class="cw-auth__links">
+        Already have an account?&nbsp;<%= link_to "Sign in", new_session_path %>
+      </div>
+    </div>
   </div>
 </div>

@@ -50,7 +50,7 @@ const writerHighlight = HighlightStyle.define([
   { tag: tags.heading4, fontWeight: "700" },
   { tag: tags.strong, fontWeight: "700" },
   { tag: tags.emphasis, fontStyle: "italic" },
-  { tag: tags.link, color: "#1d4ed8", textDecoration: "underline" },
+  { tag: tags.link, color: "var(--cw-link)", textDecoration: "underline" },
   { tag: tags.url, color: "#6b7280" },
   { tag: tags.monospace, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace", color: "#374151" },
   { tag: tags.quote, color: "#4b5563", fontStyle: "italic" },

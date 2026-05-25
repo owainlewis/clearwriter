@@ -5,24 +5,25 @@ module Api
 
       def index
         scope = current_user.documents.order(updated_at: :desc)
+        scope = scope.search(params[:q]) if params[:q].present?
         scope = scope.with_tag(params[:tag]) if params[:tag].present?
         scope = scope.updated_since(parse_since(params[:since])) if parse_since(params[:since])
 
-        render json: scope.map { |d| serialize(d) }
+        render json: scope.map { |d| document_json(d) }
       end
 
       def show
-        render json: serialize(@document)
+        render json: document_json(@document)
       end
 
       def create
-        document = current_user.documents.create!(document_params_safe)
-        render status: :created, json: serialize(document)
+        document = current_user.documents.create!(document_create_params)
+        render status: :created, json: document_json(document)
       end
 
       def update
-        @document.update!(document_params_safe)
-        render json: serialize(@document)
+        @document.update!(document_create_params)
+        render json: document_json(@document)
       end
 
       def destroy
@@ -34,28 +35,6 @@ module Api
 
       def set_document
         @document = current_user.documents.find_by!(public_token: params[:id])
-      end
-
-      def serialize(d)
-        {
-          id: d.public_token,
-          title: d.title,
-          tags: d.tags,
-          is_public: d.is_public,
-          public_url: d.is_public ? Rails.application.routes.url_helpers.public_document_url(d.public_token, host: request.host_with_port, protocol: request.protocol) : nil,
-          updated_at: d.updated_at,
-          created_at: d.created_at
-        }
-      end
-
-      def document_params_safe
-        # title is derived from the body's first heading server-side, so it
-        # isn't accepted from the API either. Tags can be a comma string or array.
-        permitted = params.permit(:body, :tags_text, tags: [])
-        if permitted[:tags].is_a?(Array)
-          permitted[:tags] = permitted[:tags].map { |t| t.to_s.strip.downcase }.reject(&:blank?).uniq
-        end
-        permitted
       end
 
       def parse_since(value)

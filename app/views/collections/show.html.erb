@@ -1,0 +1,73 @@
+<div class="cw-page cw-page--wide" data-controller="reveal" data-action="keydown@window->reveal#close">
+  <% if notice = flash[:notice] %>
+    <p class="cw-flash cw-flash--notice"><%= notice %></p>
+  <% end %>
+
+  <div class="cw-page__header cw-page__header--detail">
+    <%= link_to collections_path, class: "cw-back-link" do %>
+      <%= icon :collection %> Collections
+    <% end %>
+    <%= button_to collection_path(@collection), method: :delete,
+          form: { data: { turbo_confirm: "Delete this collection? The documents are kept." } },
+          class: "cw-btn cw-btn--danger" do %>
+      Delete collection
+    <% end %>
+  </div>
+
+  <div class="cw-detail-title">
+    <%= icon :collection, class: "cw-detail-title__icon" %>
+    <h1 class="cw-detail-title__text"><%= @collection.display_name %></h1>
+    <button type="button" class="cw-btn cw-btn--ghost cw-btn--sm"
+            data-reveal-target="trigger" data-action="reveal#toggle">Rename</button>
+  </div>
+  <p class="cw-detail-meta"><%= pluralize(@documents.size, "document") %></p>
+
+  <%= form_with url: collection_path(@collection), scope: :collection, method: :patch,
+        class: "cw-form-card cw-hidden", data: { reveal_target: "panel" } do |f| %>
+    <%= f.text_field :name, value: @collection.name, placeholder: Collection::NAME_FALLBACK,
+          class: "cw-input cw-input--title", required: true, data: { reveal_target: "field" } %>
+    <%= f.submit "Save", class: "cw-btn cw-btn--primary" %>
+    <button type="button" class="cw-btn cw-btn--ghost" data-action="reveal#toggle">Cancel</button>
+  <% end %>
+
+  <section class="cw-section">
+    <div class="cw-section__head">
+      <h2 class="cw-section__title">Documents</h2>
+    </div>
+    <% if @documents.empty? %>
+      <p class="cw-empty">No documents in this collection yet.</p>
+    <% else %>
+      <ul class="cw-doc-list">
+        <% @documents.each do |document| %>
+          <li class="cw-doc-list__item cw-doc-list__item--with-action">
+            <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
+              <span class="cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}">
+                <%= icon :document, class: "cw-doc-list__icon" %> <%= document.title.presence || "Untitled" %>
+              </span>
+              <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
+            <% end %>
+            <%= button_to collection_document_path(@collection, document), method: :delete,
+                  class: "cw-row-remove", form_class: "cw-row-action",
+                  title: "Remove from collection", "aria-label": "Remove from collection" do %>
+              <%= icon :close %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+
+  <% if @addable_documents.any? %>
+    <section class="cw-section">
+      <div class="cw-section__head">
+        <h2 class="cw-section__title">Add a document</h2>
+      </div>
+      <%= form_with url: collection_documents_path(@collection), method: :post, class: "cw-picker" do |f| %>
+        <%= f.select :document_id,
+              @addable_documents.map { |d| [ d.title.presence || "Untitled", d.public_token ] },
+              {}, class: "cw-input" %>
+        <%= f.submit "Add", class: "cw-btn cw-btn--primary" %>
+      <% end %>
+    </section>
+  <% end %>
+</div>

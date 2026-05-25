@@ -1,0 +1,53 @@
+<div class="cw-page cw-page--board">
+  <% if notice = flash[:notice] %>
+    <p class="cw-flash cw-flash--notice"><%= notice %></p>
+  <% end %>
+
+  <div class="cw-page__header">
+    <h1 class="cw-page__title">Tasks</h1>
+  </div>
+
+  <div class="board" data-controller="board">
+    <% Task::STATUSES.each do |status| %>
+      <% tasks = @tasks_by_status[status] || [] %>
+      <section class="board__col">
+        <header class="board__col-head">
+          <span class="board__col-title board__col-title--<%= status %>"><%= Task::STATUS_LABELS[status] %></span>
+          <span class="board__col-count"><%= tasks.size %></span>
+        </header>
+
+        <ul class="board__list" data-board-target="list" data-status="<%= status %>">
+          <% tasks.each do |task| %>
+            <li class="board__card" data-task-id="<%= task.public_token %>">
+              <%= link_to task_path(task), class: "board__card-link" do %>
+                <span class="board__card-title"><%= task.display_title %></span>
+                <% comments = task.task_comments.size %>
+                <% docs = task.task_documents.size %>
+                <% if comments.positive? || docs.positive? %>
+                  <span class="board__card-meta">
+                    <% if comments.positive? %><span><%= icon :comment %> <%= comments %></span><% end %>
+                    <% if docs.positive? %><span><%= icon :document %> <%= docs %></span><% end %>
+                  </span>
+                <% end %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+
+        <div class="board__add" data-controller="reveal" data-action="keydown@window->reveal#close">
+          <button type="button" class="board__add-btn" data-reveal-target="trigger" data-action="reveal#toggle">
+            <%= icon :plus %> Add a task
+          </button>
+          <%= form_with url: tasks_path, scope: :task, method: :post, class: "board__add-form cw-hidden", data: { reveal_target: "panel" } do |f| %>
+            <%= f.hidden_field :status, value: status %>
+            <%= f.text_field :title, placeholder: "Task title…", class: "cw-input board__add-input", required: true, data: { reveal_target: "field" } %>
+            <div class="board__add-actions">
+              <%= f.submit "Add", class: "cw-btn cw-btn--primary cw-btn--sm" %>
+              <button type="button" class="cw-btn cw-btn--ghost cw-btn--sm" data-action="reveal#toggle">Cancel</button>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </div>
+</div>
