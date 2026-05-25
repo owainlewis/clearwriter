@@ -11,7 +11,7 @@ class RegistrationsController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       start_new_session_for @user
-      redirect_to after_authentication_url, notice: "Welcome to Clearwriter."
+      redirect_to after_authentication_url, notice: "Welcome to Atrium."
     else
       render :new, status: :unprocessable_entity
     end

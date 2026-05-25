@@ -36,7 +36,7 @@ class DocumentsController < ApplicationController
   # reflects unsaved changes without writing them.
   def preview
     body = params[:body].presence || @document.body
-    render html: ClearwriterMarkdown.render(body), layout: false
+    render html: AtriumMarkdown.render(body), layout: false
   end
 
   private

@@ -1,16 +1,24 @@
 <div class="cw-auth">
-  <% if alert = flash[:alert] %>
-    <p class="cw-flash cw-flash--alert"><%= alert %></p>
-  <% end %>
+  <div class="cw-auth__inner">
+    <%= link_to root_path, class: "cw-auth__brand" do %>
+      <span class="cw-auth__brand-mark"></span> Atrium
+    <% end %>
 
-  <h1 class="cw-auth__title">Forgot your password?</h1>
+    <div class="cw-auth__card">
+      <% if alert = flash[:alert] %>
+        <p class="cw-flash cw-flash--alert"><%= alert %></p>
+      <% end %>
 
-  <%= form_with url: passwords_path, class: "contents" do |form| %>
-    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", value: params[:email_address], class: "cw-auth__field" %>
-    <%= form.submit "Email reset instructions", class: "cw-btn cw-btn--primary cw-auth__submit" %>
-  <% end %>
+      <h1 class="cw-auth__title">Forgot your password?</h1>
 
-  <div class="cw-auth__links">
-    <%= link_to "Back to sign in", new_session_path %>
+      <%= form_with url: passwords_path, class: "contents" do |form| %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", value: params[:email_address], class: "cw-auth__field" %>
+        <%= form.submit "Email reset instructions", class: "cw-btn cw-btn--primary cw-auth__submit" %>
+      <% end %>
+
+      <div class="cw-auth__links">
+        <%= link_to "Back to sign in", new_session_path %>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-# Clearwriter
+# Atrium
 
 Agent-native online writing for SOPs, prompts, and skills. A minimalist markdown editor in the browser where humans get a beautiful share link and agents get a raw `.md` HTTP endpoint at the same URL.
 

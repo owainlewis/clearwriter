@@ -1,21 +1,29 @@
 <div class="cw-auth">
-  <% if alert = flash[:alert] %>
-    <p class="cw-flash cw-flash--alert"><%= alert %></p>
-  <% end %>
-  <% if notice = flash[:notice] %>
-    <p class="cw-flash cw-flash--notice"><%= notice %></p>
-  <% end %>
+  <div class="cw-auth__inner">
+    <%= link_to root_path, class: "cw-auth__brand" do %>
+      <span class="cw-auth__brand-mark"></span> Atrium
+    <% end %>
 
-  <h1 class="cw-auth__title">Sign in</h1>
+    <div class="cw-auth__card">
+      <% if alert = flash[:alert] %>
+        <p class="cw-flash cw-flash--alert"><%= alert %></p>
+      <% end %>
+      <% if notice = flash[:notice] %>
+        <p class="cw-flash cw-flash--notice"><%= notice %></p>
+      <% end %>
 
-  <%= form_with url: session_url, class: "contents" do |form| %>
-    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", value: params[:email_address], class: "cw-auth__field" %>
-    <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Password", maxlength: 72, class: "cw-auth__field" %>
-    <%= form.submit "Sign in", class: "cw-btn cw-btn--primary cw-auth__submit" %>
-  <% end %>
+      <h1 class="cw-auth__title">Sign in</h1>
 
-  <div class="cw-auth__links">
-    <%= link_to "Forgot password?", new_password_path %>
-    <%= link_to "Sign up", new_registration_path %>
+      <%= form_with url: session_url, class: "contents" do |form| %>
+        <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", value: params[:email_address], class: "cw-auth__field" %>
+        <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Password", maxlength: 72, class: "cw-auth__field" %>
+        <%= form.submit "Sign in", class: "cw-btn cw-btn--primary cw-auth__submit" %>
+      <% end %>
+
+      <div class="cw-auth__links">
+        <%= link_to "Forgot password?", new_password_path %>
+        <%= link_to "Sign up", new_registration_path %>
+      </div>
+    </div>
   </div>
 </div>

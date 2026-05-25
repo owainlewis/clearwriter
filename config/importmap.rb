@@ -28,3 +28,4 @@ pin "@marijn/find-cluster-break", to: "@marijn--find-cluster-break.js" # @1.0.2
 pin "crelt" # @1.0.6
 pin "style-mod" # @4.1.3
 pin "w3c-keyname" # @2.2.8
+pin "sortablejs" # @1.15.7

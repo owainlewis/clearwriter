@@ -37,6 +37,31 @@ module Api
         # see Api::V1::ContentsController.
         render status: status, json: { error: code, message: message }
       end
+
+      # Shared document representation used by the documents and collections
+      # endpoints. public_url is only present once a doc has been shared.
+      def document_json(d)
+        {
+          id: d.public_token,
+          title: d.title,
+          tags: d.tags,
+          is_public: d.is_public,
+          public_url: d.is_public ? Rails.application.routes.url_helpers.public_document_url(d.public_token, host: request.host_with_port, protocol: request.protocol) : nil,
+          updated_at: d.updated_at,
+          created_at: d.created_at
+        }
+      end
+
+      # Shared, safe params for creating a document from the API. Title is
+      # always derived from the body server-side, so it's never accepted here.
+      # Tags may arrive as a comma string (tags_text) or an array.
+      def document_create_params
+        permitted = params.permit(:body, :tags_text, tags: [])
+        if permitted[:tags].is_a?(Array)
+          permitted[:tags] = permitted[:tags].map { |t| t.to_s.strip.downcase }.reject(&:blank?).uniq
+        end
+        permitted
+      end
     end
   end
 end

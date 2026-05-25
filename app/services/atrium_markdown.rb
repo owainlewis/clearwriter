@@ -6,7 +6,7 @@ require "commonmarker"
 #   - any future agent-facing rendered surfaces
 #
 # Safe mode is non-negotiable: no raw HTML pass-through, no javascript: URLs.
-module ClearwriterMarkdown
+module AtriumMarkdown
   OPTIONS = {
     extension: {
       table: true,

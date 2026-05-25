@@ -1,4 +1,4 @@
-# Clearwriter — Product Vision
+# Atrium — Product Vision
 
 ## Positioning
 
@@ -24,7 +24,7 @@ None of these treat "an agent fetches this document over HTTP" as a first-class 
 One app where:
 
 1. You write markdown in a beautiful, iA Writer–style browser editor.
-2. You toggle "Share" and get a short URL (`clearwriter.app/d/:token`).
+2. You toggle "Share" and get a short URL (`atrium.app/d/:token`).
 3. Humans visiting the URL see rendered HTML; agents `curl` the same URL with `.md` appended and get raw markdown.
 4. Authenticated agents can also read, create, update, and delete documents over an HTTP API with bearer tokens — the same backend, second client.
 
@@ -42,7 +42,7 @@ The browser editor and the HTTP API are co-equal first-class clients of the same
 
 | Tool | Editor | Share | Agent API | Price |
 |---|---|---|---|---|
-| **Clearwriter** | iA-Writer-style | One-click, opaque token | First-class HTTP + bearer tokens | $8/mo |
+| **Atrium** | iA-Writer-style | One-click, opaque token | First-class HTTP + bearer tokens | $8/mo |
 | Obsidian | Excellent | Obsidian Publish ($10/mo) | None | Free + $10 Publish |
 | Obsidian Sync | Excellent | None | None | $4/mo |
 | GitHub Gist | textarea, 2008 | Free | Raw URL only, no write API in spirit | Free |
@@ -50,7 +50,7 @@ The browser editor and the HTTP API are co-equal first-class clients of the same
 | HackMD | Markdown WYSIWYG | Free | Limited | Free + $5/mo |
 | iA Writer | Best-in-class | None (local app) | None | $50 one-time/device |
 
-Clearwriter's only direct overlap is Obsidian Publish + Obsidian Sync combined ($14/mo). Clearwriter is $8/mo and adds the agent API neither of them has.
+Atrium's only direct overlap is Obsidian Publish + Obsidian Sync combined ($14/mo). Atrium is $8/mo and adds the agent API neither of them has.
 
 ## Pricing
 
@@ -60,7 +60,7 @@ Clearwriter's only direct overlap is Obsidian Publish + Obsidian Sync combined (
 - **3 active public share links**
 - Read-only API for **public** docs (the raw `.md` URL is already public — this is free as a side effect)
 - No bearer-token write API
-- "Made with Clearwriter" footer on share pages
+- "Made with Atrium" footer on share pages
 - Email + password auth
 
 ### Pro — $8/mo, $80/yr (saves $16)
@@ -198,7 +198,7 @@ Open design questions to resolve before building:
 ### v1.4+ — Distribution
 
 - **Public user index** at `/u/:username` — a person's published docs and collections in one place.
-- **Custom subdomain** for share links (`yourname.clearwriter.app/d/...`).
+- **Custom subdomain** for share links (`yourname.atrium.app/d/...`).
 - **MCP server** wrapping the HTTP API so Claude Code / Cursor can mount docs as a filesystem.
 - **Webhooks** (`document.updated`) for agent loops.
 
@@ -219,8 +219,8 @@ Open design questions to resolve before building:
 - **Pricing**: $25/mo Personal (50 sessions), $35/seat Teams (min 3 seats, 100 sessions/seat), $30/mo via the "Every Bundle" suite.
 - **Has**: brand-voice writing styles, multi-angle drafts, file uploads for context.
 - **Lacks**: markdown editor, share links, HTTP API. Sessions-based, not document-based.
-- **Read on overlap**: **complementary, not directly competitive.** Spiral generates drafts; Clearwriter hosts and shares the resulting docs and exposes them to agents. A user could plausibly use both — draft in Spiral, store and share in Clearwriter.
-- **Pricing signal**: their $25 personal tier proves the writing-tool audience pays serious money. Clearwriter's lower price reflects different unit economics (no LLM cost), not weaker value — but it does suggest $8 is a floor, not a ceiling, if positioning shifts.
+- **Read on overlap**: **complementary, not directly competitive.** Spiral generates drafts; Atrium hosts and shares the resulting docs and exposes them to agents. A user could plausibly use both — draft in Spiral, store and share in Atrium.
+- **Pricing signal**: their $25 personal tier proves the writing-tool audience pays serious money. Atrium's lower price reflects different unit economics (no LLM cost), not weaker value — but it does suggest $8 is a floor, not a ceiling, if positioning shifts.
 
 ### To add as encountered
 

@@ -1,7 +1,12 @@
 <%
-  current_doc_id = (@document.is_a?(Document) ? @document.id : nil)
-  recent_docs = Current.user.documents.order(updated_at: :desc).limit(20)
   total_docs = Current.user.documents.count
+  collections = Current.user.collections.ordered.limit(20)
+
+  # Which resource "tab" is active, so its sidebar header highlights. Tags
+  # filter documents, so they count as the Documents tab.
+  docs_active = %w[documents tags].include?(controller_name)
+  collections_active = %w[collections collection_documents].include?(controller_name)
+  tasks_active = %w[tasks task_comments task_documents].include?(controller_name)
   tag_counts = Current.user.documents
     .where("array_length(tags, 1) > 0")
     .pluck(:tags)
@@ -23,7 +28,7 @@
 
   <aside class="app-sidebar">
     <div class="app-sidebar__top">
-      <%= link_to "Clearwriter", documents_path, class: "app-sidebar__brand" %>
+      <%= link_to "Atrium", documents_path, class: "app-sidebar__brand" %>
       <div class="app-sidebar__top-actions">
         <%= button_to "+", documents_path, method: :post, class: "app-sidebar__icon-btn", title: "New document", "aria-label": "New document" %>
         <button type="button"
@@ -34,29 +39,46 @@
       </div>
     </div>
 
+    <%# Documents has no list here on purpose: there can be hundreds, so the
+        index page is the place to browse them. Collections are project
+        bundles — few enough to list for quick access. %>
     <section class="app-sidebar__section">
-      <div class="app-sidebar__label">Recent</div>
-      <% if recent_docs.empty? %>
-        <p class="app-sidebar__empty">No documents yet.</p>
-      <% else %>
+      <%= link_to documents_path, class: "app-sidebar__tab #{'app-sidebar__tab--active' if docs_active}" do %>
+        <%= icon :document, class: "app-sidebar__tab-icon" %>
+        <span class="app-sidebar__tab-label">Documents</span>
+        <span class="app-sidebar__tab-count"><%= total_docs %></span>
+      <% end %>
+      <%= link_to tasks_path, class: "app-sidebar__tab #{'app-sidebar__tab--active' if tasks_active}" do %>
+        <%= icon :board, class: "app-sidebar__tab-icon" %>
+        <span class="app-sidebar__tab-label">Tasks</span>
+        <span class="app-sidebar__tab-count"><%= Current.user.tasks.count %></span>
+      <% end %>
+    </section>
+
+    <section class="app-sidebar__section">
+      <%= link_to collections_path, class: "app-sidebar__tab #{'app-sidebar__tab--active' if collections_active}" do %>
+        <%= icon :collection, class: "app-sidebar__tab-icon" %>
+        <span class="app-sidebar__tab-label">Collections</span>
+        <span class="app-sidebar__tab-count"><%= Current.user.collections.count %></span>
+      <% end %>
+      <% if collections.any? %>
         <ul class="app-sidebar__list">
-          <% recent_docs.each do |doc| %>
+          <% collections.each do |collection| %>
             <li>
-              <%= link_to edit_document_path(doc), class: "app-sidebar__item #{'app-sidebar__item--active' if doc.id == current_doc_id}" do %>
-                <span class="app-sidebar__item-title <%= 'app-sidebar__item-title--untitled' if doc.title.blank? %>"><%= doc.title.presence || "Untitled" %></span>
+              <%= link_to collection_path(collection), class: "app-sidebar__item" do %>
+                <span class="app-sidebar__item-title"><%= collection.display_name %></span>
               <% end %>
             </li>
           <% end %>
         </ul>
-        <% if total_docs > recent_docs.size %>
-          <%= link_to "All documents →", documents_path(since: "all"), class: "app-sidebar__more" %>
-        <% end %>
       <% end %>
     </section>
 
     <% if tag_counts.any? %>
       <section class="app-sidebar__section">
-        <div class="app-sidebar__label">Tags</div>
+        <div class="app-sidebar__section-label">
+          <%= icon :tag, class: "app-sidebar__section-label-icon" %> Tags
+        </div>
         <ul class="app-sidebar__list">
           <% tag_counts.each do |tag, count| %>
             <li>
