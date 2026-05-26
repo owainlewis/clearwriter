@@ -9,20 +9,59 @@
   </div>
 
   <% current_since = params[:since].presence || "7d" %>
+  <% current_view = params[:view] == "grid" ? "grid" : "list" %>
   <nav class="cw-filters">
     <% [["7d", "Last 7 days"], ["30d", "Last 30 days"], ["all", "All"]].each do |val, label| %>
       <% active = current_since == val %>
-      <%= link_to label, documents_path(since: val, tag: @tag),
+      <%= link_to label, documents_path(since: val, tag: @tag, view: current_view),
             class: "cw-chip #{'cw-chip--active' if active}" %>
     <% end %>
     <% if @tag %>
       <span style="margin-left: 8px; color: var(--cw-muted);">Tag:</span>
-      <%= link_to "#{@tag} ✕", documents_path(since: current_since), class: "cw-chip cw-chip--active" %>
+      <%= link_to "#{@tag} ✕", documents_path(since: current_since, view: current_view), class: "cw-chip cw-chip--active" %>
     <% end %>
+
+    <span class="cw-view-toggle" aria-label="Document view">
+      <%= link_to documents_path(since: current_since, tag: @tag, view: "list"),
+            class: "cw-view-toggle__item #{'cw-view-toggle__item--active' if current_view == 'list'}",
+            title: "List view",
+            "aria-label": "List view",
+            "aria-current": ("page" if current_view == "list") do %>
+        <%= icon :list %>
+      <% end %>
+      <%= link_to documents_path(since: current_since, tag: @tag, view: "grid"),
+            class: "cw-view-toggle__item #{'cw-view-toggle__item--active' if current_view == 'grid'}",
+            title: "Grid view",
+            "aria-label": "Grid view",
+            "aria-current": ("page" if current_view == "grid") do %>
+        <%= icon :grid %>
+      <% end %>
+    </span>
   </nav>
 
   <% if @documents.empty? %>
     <p class="cw-empty">No documents in this view. Try “All” or create one.</p>
+  <% elsif current_view == "grid" %>
+    <div class="cw-doc-grid">
+      <% @documents.each do |document| %>
+        <%= link_to edit_document_path(document), class: "cw-doc-card" do %>
+          <span class="cw-doc-card__title #{'cw-doc-card__title--untitled' if document.title.blank?}">
+            <%= document.title.presence || "Untitled" %>
+          </span>
+          <span class="cw-doc-card__excerpt"><%= truncate(document_card_excerpt(document), length: 190, separator: " ") %></span>
+          <span class="cw-doc-card__meta">
+            <span><%= document.updated_at.strftime("%b %-d") %></span>
+            <% if document.tags.any? %>
+              <span class="cw-doc-card__tags">
+                <% document.tags.first(3).each do |tag| %>
+                  <span class="cw-chip cw-chip--tag"><%= tag %></span>
+                <% end %>
+              </span>
+            <% end %>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
   <% else %>
     <ul class="cw-doc-list">
       <% @documents.each do |document| %>

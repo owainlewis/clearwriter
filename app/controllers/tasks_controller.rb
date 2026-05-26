@@ -10,9 +10,8 @@ class TasksController < ApplicationController
 
   def show
     @documents = @task.documents.order(updated_at: :desc)
-    @addable_documents = Current.user.documents
-      .where.not(id: @task.document_ids)
-      .order(updated_at: :desc)
+    # Linkable documents are fetched on demand by the search picker
+    # (see TaskDocumentsController#search).
   end
 
   def create
