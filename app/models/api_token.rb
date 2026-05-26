@@ -1,7 +1,7 @@
 require "digest"
 
 class ApiToken < ApplicationRecord
-  PREFIX = "cw_"
+  PREFIX = "pair_"
   RANDOM_LENGTH = 24
 
   belongs_to :user

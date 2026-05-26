@@ -3,9 +3,9 @@ require "test_helper"
 class ApiTokenTest < ActiveSupport::TestCase
   setup { @user = users(:alice) }
 
-  test "create_for_user! returns raw token once with cw_ prefix" do
+  test "create_for_user! returns raw token once with pair_ prefix" do
     record = ApiToken.create_for_user!(@user, name: "ci")
-    assert_match(/\Acw_[A-Za-z0-9_\-]+\z/, record.raw_token)
+    assert_match(/\Apair_[A-Za-z0-9_\-]+\z/, record.raw_token)
     assert_equal "ci", record.name
   end
 
@@ -23,7 +23,7 @@ class ApiTokenTest < ActiveSupport::TestCase
   end
 
   test "authenticate fails on a wrong token" do
-    assert_nil ApiToken.authenticate("cw_definitely-not-real")
+    assert_nil ApiToken.authenticate("pair_definitely-not-real")
     assert_nil ApiToken.authenticate(nil)
     assert_nil ApiToken.authenticate("")
   end

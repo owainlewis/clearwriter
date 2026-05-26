@@ -28,7 +28,7 @@ module ApplicationHelper
   end
 
   def document_card_excerpt(document)
-    text = strip_tags(AtriumMarkdown.render(document.body.to_s)).squish
+    text = strip_tags(PairMarkdown.render(document.body.to_s)).squish
     title = document.title.to_s.squish
     text = text.delete_prefix(title).squish if title.present?
     text.presence || "No body yet."

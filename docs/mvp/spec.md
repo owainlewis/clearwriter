@@ -1,8 +1,8 @@
-# Atrium MVP
+# PAIR MVP
 
 ## What
 
-**Atrium** (`atrium.app`) is agent-native online writing for SOPs, prompts, and skills. It's a minimalist browser-based markdown editor where the same document is reachable by humans as a beautiful share link and by agents as a raw `.md` HTTP endpoint. Storage *is* markdown — no AST, no blocks, no JSON wrapping anywhere in the pipeline. Browser editor and HTTP API are co-equal first-class clients of the same backend.
+**PAIR** (`usepair.ai`) is agent-native online writing for SOPs, prompts, and skills. It's a minimalist browser-based markdown editor where the same document is reachable by humans as a beautiful share link and by agents as a raw `.md` HTTP endpoint. Storage *is* markdown — no AST, no blocks, no JSON wrapping anywhere in the pipeline. Browser editor and HTTP API are co-equal first-class clients of the same backend.
 
 ## Context
 
@@ -10,7 +10,7 @@ The author writes SOPs, prompts, and Claude skills constantly and currently shuf
 
 The wedge is **gist's URL primitive + iA Writer's editor + a real API for agents**. The category is not "another Notion" or "another Obsidian" — it's "GitHub Gist for the agent era, with a writing UX that doesn't make you cry."
 
-Greenfield project. Empty repo at `/Users/owainlewis/Code/mdwriter` (directory name predates the rename; keep or rename to `atrium` at scaffold time — author's call).
+Greenfield project. Empty repo at `/Users/owainlewis/Code/pair` (directory name predates the rename; current local directory may still be renamed separately).
 
 ## Requirements
 
@@ -42,7 +42,7 @@ Greenfield project. Empty repo at `/Users/owainlewis/Code/mdwriter` (directory n
 - **Secret Manager** for `RAILS_MASTER_KEY`, DB password, Resend API key.
 - **Cloud SQL Auth Proxy** (Cloud Run native integration) for DB connections.
 - **Resend** API (HTTP, not SMTP) for transactional magic-link mail, sent **synchronously** in the request — no background queue needed for MVP volume.
-- **Domain mapping**: Cloud Run domain mapping for `atrium.app` (or Google-managed external HTTPS LB if mapping limits bite).
+- **Domain mapping**: Cloud Run domain mapping for `usepair.ai` (or Google-managed external HTTPS LB if mapping limits bite).
 - **Cloud CDN** fronts the public share routes (`/d/:token`, `/d/:token.md`). Cache TTL ~5 minutes with cache-tag invalidation on document update. Reduces origin load and absorbs viral-share traffic spikes.
 - **`rack-attack`** gem for in-app request throttling (auth brute-force, doc-creation spam, API rate limits).
 
@@ -142,7 +142,7 @@ DELETE /api/v1/documents/:id
 
 - `rails g authentication` provides email + password sign-up, sign-in, sign-out, and password reset. No custom code needed beyond styling.
 - Password reset emails sent synchronously via Resend API.
-- API: bearer token in `Authorization: Bearer <token>`. Stored as `token_digest = Digest::SHA256.hexdigest(token)`. Token is `"cw_" + SecureRandom.urlsafe_base64(24)`, shown once.
+- API: bearer token in `Authorization: Bearer <token>`. Stored as `token_digest = Digest::SHA256.hexdigest(token)`. Token is `"pair_" + SecureRandom.urlsafe_base64(24)`, shown once.
 
 ## Decisions
 
@@ -168,7 +168,7 @@ DELETE /api/v1/documents/:id
 
 10. **No full-text search in MVP.** Alternative: ship Postgres `tsvector` + GIN from day one. Cut because tags + "recent" filter + browse-by-list is enough for hundreds of docs, and search adds an indexed generated column, a search UI, and result-ranking decisions that are easier to make once we see real usage patterns. Reversible — add as a generated column later without a data migration.
 
-11. **One Rails app, one domain (`atrium.app`), path-based split between marketing and app.** Alternative: `app.atrium.app` subdomain. Chosen because the most important URL in the product is the public share URL (`atrium.app/d/:token`) — shorter and cleaner without an `app.` prefix. Subdomain split adds ops surface (TLS, cross-subdomain cookies, two deploys) for benefits a solo dev doesn't yet need. Reversible.
+11. **One Rails app, one domain (`usepair.ai`), path-based split between marketing and app.** Alternative: `app.usepair.ai` subdomain. Chosen because the most important URL in the product is the public share URL (`usepair.ai/d/:token`) — shorter and cleaner without an `app.` prefix. Subdomain split adds ops surface (TLS, cross-subdomain cookies, two deploys) for benefits a solo dev doesn't yet need. Reversible.
 
 12. **User identity is not in any URL.** Owner edit URLs (`/documents/:id`) are session-scoped; public share URLs (`/d/:token`) use opaque tokens with no username; API URLs are bearer-scoped. `/u/:username` is reserved for the future public profile page. Chosen for shorter URLs, no rename traps, and IDOR safety. Reversible.
 
@@ -249,7 +249,7 @@ Plan enforcement is on a `User#plan` enum (`:free`, `:pro`) with `User#document_
 - **Webhooks** (`document.updated`) for agent loops.
 - **MCP server** wrapping the HTTP API so Claude Code / Cursor can mount docs as a filesystem.
 - **Public user index** (`/u/:username`) of someone's shared SOPs. Discovery/distribution mechanism.
-- **Custom subdomains** for share links (`yourname.atrium.app/d/...`).
+- **Custom subdomains** for share links (`yourname.usepair.ai/d/...`).
 
 **Out for MVP, undecided** (revisit when product has users):
 - Offline / PWA.

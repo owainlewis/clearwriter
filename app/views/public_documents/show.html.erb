@@ -1,10 +1,10 @@
 <div class="cw-page">
   <article class="preview-host">
-    <%= AtriumMarkdown.render(@document.body) %>
+    <%= PairMarkdown.render(@document.body) %>
   </article>
 
   <footer style="margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--cw-line); color: var(--cw-faint); font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between;">
-    <span>Made with <a href="/">Atrium</a></span>
+    <span>Made with <a href="/">PAIR</a></span>
     <span><%= @document.updated_at.strftime("%b %-d, %Y") %></span>
   </footer>
 </div>

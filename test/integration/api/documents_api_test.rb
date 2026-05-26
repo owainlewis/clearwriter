@@ -21,7 +21,7 @@ class Api::DocumentsApiTest < ActionDispatch::IntegrationTest
   end
 
   test "garbage token → 401" do
-    get "/api/v1/documents", headers: { "Authorization" => "Bearer cw_garbage" }
+    get "/api/v1/documents", headers: { "Authorization" => "Bearer pair_garbage" }
     assert_response :unauthorized
   end
 
