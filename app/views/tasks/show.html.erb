@@ -18,9 +18,10 @@
     <%= f.text_field :title, value: @task.title, placeholder: Task::TITLE_FALLBACK,
           class: "cw-input cw-input--title task-edit__title", required: true %>
     <div class="task-edit__row">
-      <%= f.select :status, Task::STATUSES.map { |s| [ Task::STATUS_LABELS[s], s ] },
-            { selected: @task.status }, class: "cw-input task-edit__status" %>
-      <%= f.submit "Save", class: "cw-btn cw-btn--primary" %>
+      <span class="task-status task-status--<%= @task.status %>">
+        <span class="task-status__dot"></span><%= Task::STATUS_LABELS[@task.status] %>
+      </span>
+      <%= f.submit "Save", class: "cw-btn cw-btn--ghost cw-btn--sm" %>
     </div>
     <%= f.text_area :description, value: @task.description, rows: 5,
           placeholder: "Add a description…", class: "cw-input task-edit__description" %>
@@ -28,35 +29,18 @@
 
   <section class="cw-section">
     <div class="cw-section__head"><h2 class="cw-section__title">Linked documents</h2></div>
-    <% if @documents.any? %>
-      <ul class="cw-doc-list">
-        <% @documents.each do |document| %>
-          <li class="cw-doc-list__item cw-doc-list__item--with-action">
-            <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
-              <span class="cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}">
-                <%= icon :document, class: "cw-doc-list__icon" %> <%= document.title.presence || "Untitled" %>
-              </span>
-              <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
-            <% end %>
-            <%= button_to task_document_path(@task, document), method: :delete,
-                  class: "cw-row-remove", form_class: "cw-row-action",
-                  title: "Unlink document", "aria-label": "Unlink document" do %>
-              <%= icon :close %>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <p class="cw-empty">No documents linked yet.</p>
-    <% end %>
-    <% if @addable_documents.any? %>
-      <%= form_with url: task_documents_path(@task), method: :post, class: "cw-picker" do |f| %>
-        <%= f.select :document_id,
-              @addable_documents.map { |d| [ d.title.presence || "Untitled", d.public_token ] },
-              {}, class: "cw-input" %>
-        <%= f.submit "Link", class: "cw-btn cw-btn--primary" %>
+
+    <%= render "shared/document_picker",
+          search_url: search_task_documents_path(@task),
+          placeholder: "Search documents to link…" %>
+
+    <ul id="linked-docs" class="cw-doc-list">
+      <% @documents.each do |document| %>
+        <%= render "shared/linked_document", document: document,
+              unlink_url: task_document_path(@task, document) %>
       <% end %>
-    <% end %>
+    </ul>
+    <p id="linked-docs-empty" class="cw-empty" <%= "hidden" if @documents.any? %>>No documents linked yet.</p>
   </section>
 
   <section class="cw-section">

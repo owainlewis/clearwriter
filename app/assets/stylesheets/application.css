@@ -326,14 +326,20 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
  * ────────────────────────────────────────────────────────────────────── */
 
 .cw-flash {
-  border-radius: 6px;
-  padding: 10px 14px;
+  border-radius: 8px;
+  padding: 9px 13px;
   margin-bottom: 20px;
-  font-size: 0.92rem;
-  display: inline-block;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  border-left-width: 3px;
+  color: var(--cw-ink-soft);
+  box-shadow: 0 1px 2px rgba(31, 41, 55, 0.04);
 }
-.cw-flash--notice { background: #ecfdf5; color: #065f46; }
-.cw-flash--alert  { background: #fef2f2; color: #991b1b; }
+.cw-flash--notice { border-left-color: #3a6b52; }
+.cw-flash--alert  { border-left-color: #b4503a; }
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Auth pages
@@ -1094,32 +1100,121 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-row-remove:hover { background: #fee2e2; color: #b91c1c; }
 .cw-row-remove .cw-icon { width: 16px; height: 16px; }
 
-/* Inline "add document" picker. */
-.cw-picker {
+/* ──────────────────────────────────────────────────────────────────────
+ *  Search picker (combobox) — type to filter, click/Enter to link
+ * ────────────────────────────────────────────────────────────────────── */
+
+.picker { position: relative; max-width: 30rem; margin-bottom: 12px; }
+.picker__field {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--cw-line);
+  border-radius: 9px;
+  background: var(--cw-surface);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
-.cw-picker .cw-input { min-width: 240px; }
+.picker__field:focus-within {
+  border-color: var(--cw-clay);
+  box-shadow: 0 0 0 3px var(--cw-clay-soft);
+}
+.picker__icon { color: var(--cw-faint); font-size: 1rem; flex-shrink: 0; }
+.picker__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 9px 0;
+  font-size: 0.95rem;
+  color: var(--cw-ink);
+}
+.picker__input::placeholder { color: var(--cw-faint); }
+
+.picker__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  border-radius: 11px;
+  box-shadow: 0 14px 36px -14px rgba(31, 41, 55, 0.24);
+  max-height: 18rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.picker__list { list-style: none; margin: 0; padding: 5px; }
+.picker__option form, .picker__option .button_to { margin: 0; }
+.picker__option-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--cw-ink);
+  font-size: 0.92rem;
+}
+.picker__option-btn:hover,
+.picker__option--active .picker__option-btn { background: var(--cw-clay-soft); }
+.picker__option-icon { color: var(--cw-faint); flex-shrink: 0; }
+.picker__option-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.picker__option-title--untitled { color: var(--cw-faint); font-style: italic; }
+.picker__option-add { color: var(--cw-clay); font-size: 0.95rem; opacity: 0; transition: opacity 0.1s ease; }
+.picker__option-btn:hover .picker__option-add,
+.picker__option--active .picker__option-add { opacity: 1; }
+.picker__empty { padding: 14px; margin: 0; color: var(--cw-muted); font-size: 0.9rem; text-align: center; }
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Task board
  * ────────────────────────────────────────────────────────────────────── */
 
-.cw-page--board { max-width: none; padding-right: 32px; }
+/* Fill the viewport so the board's horizontal scrollbar sits pinned at the
+   bottom of the screen (Trello-style), instead of mid-page under the cards. */
+.cw-page--board {
+  max-width: none;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 56px 24px 16px;
+  overflow: hidden;
+}
 
 .board {
+  flex: 1;
+  min-height: 0;
   display: flex;
   gap: 16px;
-  align-items: flex-start;
+  align-items: stretch;
   overflow-x: auto;
-  padding-bottom: 24px;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+  /* Trello-style scroll: the bar stays out of the way and only fades in,
+     thin and subtle, while the pointer is over the board. */
+  scrollbar-width: thin;                       /* Firefox */
+  scrollbar-color: transparent transparent;
 }
+.board:hover { scrollbar-color: var(--cw-line) transparent; }
+.board::-webkit-scrollbar { height: 8px; }
+.board::-webkit-scrollbar-track { background: transparent; }
+.board::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+}
+.board:hover::-webkit-scrollbar-thumb { background: var(--cw-line); }
+.board::-webkit-scrollbar-thumb:hover { background: var(--cw-faint); }
 .board__col {
   flex: 0 0 280px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-height: 0;
 }
 .board__col-head {
   display: flex;
@@ -1162,11 +1257,21 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 40px;
   border-radius: 10px;
   background: var(--cw-line-soft);
+  /* Fill the column and scroll internally when a column is taller than the
+     viewport, so the board's own scrollbar stays horizontal-only. */
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
+.board__list:hover { scrollbar-color: var(--cw-line) transparent; }
+.board__list::-webkit-scrollbar { width: 8px; }
+.board__list::-webkit-scrollbar-track { background: transparent; }
+.board__list::-webkit-scrollbar-thumb { background: transparent; border-radius: 8px; }
+.board__list:hover::-webkit-scrollbar-thumb { background: var(--cw-line); }
 
 .board__card {
   background: var(--cw-surface);
@@ -1174,7 +1279,7 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   border-radius: 9px;
   box-shadow: 0 1px 2px rgba(31, 41, 55, 0.04);
   cursor: grab;
-  transition: box-shadow 0.12s ease, border-color 0.12s ease, transform 0.06s ease;
+  transition: box-shadow 0.12s ease, border-color 0.12s ease;
 }
 .board__card:hover { border-color: #d6d3cb; box-shadow: 0 2px 8px -2px rgba(31, 41, 55, 0.12); }
 .board__card:active { cursor: grabbing; }
@@ -1199,7 +1304,9 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 /* SortableJS drag states. */
 .board__card--ghost { opacity: 0.4; }
 .board__card--chosen { box-shadow: 0 8px 24px -8px rgba(31, 41, 55, 0.28); }
-.board__card--drag { transform: rotate(1.5deg); }
+/* The fallback mirror is repositioned via inline transform on every pointer
+   move — any transform transition makes it lag behind the cursor. */
+.board__card--drag { transition: none; }
 
 .board__add { padding: 0 4px; }
 .board__add-btn {
@@ -1227,14 +1334,103 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 
 .task-edit { display: flex; flex-direction: column; gap: 14px; margin-bottom: 8px; }
 .task-edit__title { width: 100%; }
-.task-edit__row { display: flex; align-items: center; gap: 10px; }
-.task-edit__status { width: auto; padding-right: 28px; }
+.task-edit__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+/* Read-only status indicator. Status is changed by dragging the card on the
+   board, so the detail view just shows where the task currently sits. */
+.task-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--cw-line-soft);
+  border: 1px solid var(--cw-line);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cw-ink-soft);
+}
+.task-status__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cw-faint); }
+.task-status--doing  .task-status__dot { background: var(--cw-clay); }
+.task-status--review .task-status__dot { background: var(--cw-warn); }
+.task-status--done   .task-status__dot { background: #3a6b52; }
 .task-edit__description {
   width: 100%;
   font-family: var(--cw-font-ui);
   line-height: 1.6;
   resize: vertical;
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+ *  Modal dialog (native <dialog>)
+ * ────────────────────────────────────────────────────────────────────── */
+
+.cw-modal {
+  /* Center in the viewport explicitly, rather than relying on the UA's
+     auto-centering for :modal dialogs (which our author styles were overriding). */
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  border: none;
+  padding: 0;
+  background: transparent;
+  width: calc(100% - 32px);
+  max-width: 30rem;
+  height: fit-content;
+  color: var(--cw-ink);
+}
+.cw-modal::backdrop {
+  background: rgba(31, 41, 55, 0.32);
+  backdrop-filter: blur(2px);
+}
+.cw-modal[open] { animation: cw-modal-in 0.14s ease; }
+@keyframes cw-modal-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.99); }
+  to   { opacity: 1; transform: none; }
+}
+.cw-modal__panel {
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  border-radius: 12px;
+  box-shadow: 0 24px 60px -24px rgba(31, 41, 55, 0.45);
+  overflow: hidden;
+}
+.cw-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--cw-line-soft);
+}
+.cw-modal__title {
+  margin: 0;
+  font-family: var(--cw-font-prose);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.cw-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--cw-muted);
+  cursor: pointer;
+}
+.cw-modal__close:hover { background: var(--cw-line-soft); color: var(--cw-ink); }
+.cw-modal__body { display: flex; flex-direction: column; gap: 16px; padding: 18px; }
+.cw-modal__foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+
+.cw-field { display: flex; flex-direction: column; gap: 6px; }
+.cw-field__label { font-size: 0.82rem; font-weight: 600; color: var(--cw-ink-soft); }
 
 .comment-list { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .comment {

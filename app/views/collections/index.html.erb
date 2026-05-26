@@ -1,23 +1,34 @@
-<div class="cw-page cw-page--wide" data-controller="reveal" data-action="keydown@window->reveal#close">
+<div class="cw-page cw-page--wide" data-controller="dialog">
   <% if notice = flash[:notice] %>
     <p class="cw-flash cw-flash--notice"><%= notice %></p>
   <% end %>
 
   <div class="cw-page__header">
     <h1 class="cw-page__title">Collections</h1>
-    <button type="button" class="cw-btn cw-btn--primary"
-            data-reveal-target="trigger" data-action="reveal#toggle">
+    <button type="button" class="cw-btn cw-btn--primary" data-action="dialog#open">
       <%= icon :plus %> New collection
     </button>
   </div>
 
-  <%= form_with url: collections_path, scope: :collection, method: :post,
-        class: "cw-form-card cw-hidden", data: { reveal_target: "panel" } do |f| %>
-    <%= f.text_field :name, placeholder: "Collection name…", class: "cw-input",
-          required: true, data: { reveal_target: "field" } %>
-    <%= f.submit "Create", class: "cw-btn cw-btn--primary" %>
-    <button type="button" class="cw-btn cw-btn--ghost" data-action="reveal#toggle">Cancel</button>
-  <% end %>
+  <dialog class="cw-modal" data-dialog-target="dialog" data-action="click->dialog#backdrop">
+    <div class="cw-modal__panel">
+      <header class="cw-modal__head">
+        <h2 class="cw-modal__title">New collection</h2>
+        <button type="button" class="cw-modal__close" data-action="dialog#close" aria-label="Close">&times;</button>
+      </header>
+      <%= form_with url: collections_path, scope: :collection, method: :post, class: "cw-modal__body" do |f| %>
+        <label class="cw-field">
+          <span class="cw-field__label">Name</span>
+          <%= f.text_field :name, placeholder: "e.g. Q3 Planning", class: "cw-input",
+                required: true, data: { dialog_target: "field" } %>
+        </label>
+        <footer class="cw-modal__foot">
+          <button type="button" class="cw-btn cw-btn--ghost" data-action="dialog#close">Cancel</button>
+          <%= f.submit "Create collection", class: "cw-btn cw-btn--primary" %>
+        </footer>
+      <% end %>
+    </div>
+  </dialog>
 
   <% if @collections.empty? %>
     <p class="cw-empty">No collections yet. Create one to group related documents.</p>

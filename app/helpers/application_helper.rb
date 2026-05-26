@@ -8,7 +8,8 @@ module ApplicationHelper
     board: %(<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/>),
     comment: %(<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/>),
     plus: %(<path d="M12 5v14"/><path d="M5 12h14"/>),
-    close: %(<path d="M18 6 6 18"/><path d="M6 6l12 12"/>)
+    close: %(<path d="M18 6 6 18"/><path d="M6 6l12 12"/>),
+    search: %(<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>)
   }.freeze
 
   def icon(name, **options)

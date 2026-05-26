@@ -1,0 +1,19 @@
+<%# Search results for the document picker. Each option is a Turbo form that
+    links the doc and streams the result back. locals: documents, link_url %>
+<% if documents.any? %>
+  <ul class="picker__list">
+    <% documents.each do |document| %>
+      <li id="result-<%= document.public_token %>" class="picker__option" data-option>
+        <%= button_to link_url, params: { document_id: document.public_token }, class: "picker__option-btn" do %>
+          <%= icon :document, class: "picker__option-icon" %>
+          <span class="picker__option-title <%= 'picker__option-title--untitled' if document.title.blank? %>">
+            <%= document.title.presence || "Untitled" %>
+          </span>
+          <span class="picker__option-add"><%= icon :plus %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="picker__empty"><%= params[:q].present? ? "No matching documents." : "No documents to link." %></p>
+<% end %>

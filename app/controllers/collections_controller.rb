@@ -7,10 +7,8 @@ class CollectionsController < ApplicationController
 
   def show
     @documents = @collection.documents
-    # Docs not yet in this collection — offered in the "add" picker.
-    @addable_documents = Current.user.documents
-      .where.not(id: @collection.document_ids)
-      .order(updated_at: :desc)
+    # Documents to add are fetched on demand by the search picker (see
+    # CollectionDocumentsController#search), so they aren't loaded here.
   end
 
   def create
