@@ -5,8 +5,12 @@
 
   <div class="cw-page__header">
     <h1 class="cw-page__title">Collections</h1>
-    <button type="button" class="cw-btn cw-btn--primary" data-action="dialog#open">
-      <%= icon :plus %> New collection
+    <button type="button"
+            class="cw-icon-btn cw-icon-btn--primary"
+            data-action="dialog#open"
+            title="New collection"
+            aria-label="New collection">
+      <%= icon :plus %>
     </button>
   </div>
 
@@ -24,7 +28,7 @@
         </label>
         <footer class="cw-modal__foot">
           <button type="button" class="cw-btn cw-btn--ghost" data-action="dialog#close">Cancel</button>
-          <%= f.submit "Create collection", class: "cw-btn cw-btn--primary" %>
+          <%= f.submit "Create", class: "cw-btn cw-btn--primary" %>
         </footer>
       <% end %>
     </div>

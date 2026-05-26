@@ -57,6 +57,30 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_document_path(@alice.documents.order(:created_at).last)
   end
 
+  test "edit starts in rendered preview mode" do
+    @doc.update!(body: "# Read first\n\nThen edit when needed.")
+
+    sign_in_as @alice
+    get edit_document_path(@doc)
+
+    assert_response :success
+    assert_select "[data-editor-initial-preview-value=?]", "true"
+    assert_select "button[aria-label=?][aria-pressed=?]", "Edit document", "true"
+    assert_select ".preview-host h1", /Read first/
+    assert_select ".preview-host p", /Then edit when needed/
+  end
+
+  test "blank documents start in edit mode" do
+    blank = @alice.documents.create!(body: "")
+
+    sign_in_as @alice
+    get edit_document_path(blank)
+
+    assert_response :success
+    assert_select "[data-editor-initial-preview-value=?]", "false"
+    assert_select "button[aria-label=?][aria-pressed=?]", "Preview document", "false"
+  end
+
   test "update succeeds and returns 204 for autosave" do
     sign_in_as @alice
     patch document_path(@doc), params: { document: { body: "# Updated" } }

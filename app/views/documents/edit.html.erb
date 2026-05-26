@@ -1,12 +1,25 @@
+<% initial_preview = @document.body.present? %>
+
 <div data-controller="editor"
      data-editor-url-value="<%= document_path(@document) %>"
      data-editor-preview-url-value="<%= preview_document_path(@document) %>"
+     data-editor-initial-preview-value="<%= initial_preview %>"
      class="cw-editor">
 
   <div class="cw-editor__bar">
     <span class="cw-editor__bar-spacer"></span>
 
     <div class="cw-editor__bar-right">
+      <button type="button"
+              class="cw-btn cw-btn--ghost cw-btn--sm"
+              data-editor-target="previewToggle"
+              data-action="editor#togglePreview"
+              aria-label="<%= initial_preview ? "Edit document" : "Preview document" %>"
+              aria-pressed="<%= initial_preview %>">
+        <%= icon :eye %>
+        <span data-editor-target="previewToggleLabel"><%= initial_preview ? "Edit" : "Preview" %></span>
+      </button>
+
       <span class="cw-status-dot"
             data-editor-target="status"
             data-state="saved"
@@ -27,12 +40,15 @@
             <%= button_to "Unshare", document_share_path(@document), method: :delete,
                   class: "cw-menu__item" %>
           <% else %>
-            <%= button_to "Share publicly", document_share_path(@document), method: :post,
+            <%= button_to "Share", document_share_path(@document), method: :post,
                   class: "cw-menu__item" %>
           <% end %>
-          <%= button_to "Delete document", document_path(@document), method: :delete,
+          <%= button_to document_path(@document), method: :delete,
                 data: { turbo_confirm: "Delete this document? This cannot be undone." },
-                class: "cw-menu__item cw-menu__item--danger" %>
+                class: "cw-menu__item cw-menu__item--danger" do %>
+            <%= icon :trash %>
+            <span>Delete</span>
+          <% end %>
         </div>
       </details>
     </div>
@@ -46,7 +62,9 @@
             placeholder: "# Start with a heading…" %>
     </div>
 
-    <div data-editor-target="previewPane" class="preview-host hidden"></div>
+    <div data-editor-target="previewPane" class="preview-host hidden">
+      <%= raw AtriumMarkdown.render(@document.body.to_s) %>
+    </div>
 
     <footer class="cw-editor__meta"
             data-controller="tag-chips"

@@ -9,8 +9,11 @@
     <% end %>
     <%= button_to collection_path(@collection), method: :delete,
           form: { data: { turbo_confirm: "Delete this collection? The documents are kept." } },
-          class: "cw-btn cw-btn--danger" do %>
-      Delete collection
+          form_class: "cw-icon-btn-form",
+          class: "cw-icon-btn cw-icon-btn--danger",
+          title: "Delete collection",
+          "aria-label": "Delete collection" do %>
+      <%= icon :trash %>
     <% end %>
   </div>
 

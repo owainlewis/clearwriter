@@ -9,8 +9,11 @@
     <% end %>
     <%= button_to task_path(@task), method: :delete,
           form: { data: { turbo_confirm: "Delete this task?" } },
-          class: "cw-btn cw-btn--danger" do %>
-      Delete task
+          form_class: "cw-icon-btn-form",
+          class: "cw-icon-btn cw-icon-btn--danger",
+          title: "Delete task",
+          "aria-label": "Delete task" do %>
+      <%= icon :trash %>
     <% end %>
   </div>
 

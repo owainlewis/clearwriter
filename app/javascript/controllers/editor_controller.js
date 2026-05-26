@@ -81,8 +81,8 @@ const SAVE_DEBOUNCE_MS = 800
 const MAX_BACKOFF_MS = 60_000
 
 export default class extends Controller {
-  static targets = ["textarea", "tags", "status", "fallbackSave", "editorPane", "previewPane"]
-  static values = { url: String, previewUrl: String }
+  static targets = ["textarea", "tags", "status", "fallbackSave", "editorPane", "previewPane", "previewToggle", "previewToggleLabel"]
+  static values = { url: String, previewUrl: String, initialPreview: Boolean }
 
   connect() {
     this.backoff = 0
@@ -130,6 +130,12 @@ export default class extends Controller {
     if (this.hasTagsTarget) {
       this.tagsTarget.addEventListener("input", () => this.scheduleSave())
     }
+
+    if (this.initialPreviewValue) {
+      this.showPreview({ refresh: false })
+    } else {
+      this.updatePreviewToggle()
+    }
   }
 
   disconnect() {
@@ -164,10 +170,29 @@ export default class extends Controller {
     if (!this.hasPreviewPaneTarget || !this.hasEditorPaneTarget) return
 
     if (this.previewing) {
-      this.previewPaneTarget.classList.add("hidden")
-      this.editorPaneTarget.classList.remove("hidden")
-      this.previewing = false
+      this.showEditor()
       if (this.view) this.view.focus()
+      return
+    }
+
+    await this.showPreview()
+  }
+
+  showEditor() {
+    this.previewPaneTarget.classList.add("hidden")
+    this.editorPaneTarget.classList.remove("hidden")
+    this.previewing = false
+    this.updatePreviewToggle()
+  }
+
+  async showPreview({ refresh = true } = {}) {
+    if (!this.hasPreviewPaneTarget || !this.hasEditorPaneTarget) return
+
+    if (!refresh) {
+      this.editorPaneTarget.classList.add("hidden")
+      this.previewPaneTarget.classList.remove("hidden")
+      this.previewing = true
+      this.updatePreviewToggle()
       return
     }
 
@@ -195,8 +220,20 @@ export default class extends Controller {
       this.editorPaneTarget.classList.add("hidden")
       this.previewPaneTarget.classList.remove("hidden")
       this.previewing = true
+      this.updatePreviewToggle()
     } catch (err) {
-      this.setStatus("Couldn't render preview")
+      this.setStatus("error", "Couldn't render preview")
+    }
+  }
+
+  updatePreviewToggle() {
+    if (this.hasPreviewToggleLabelTarget) {
+      this.previewToggleLabelTarget.textContent = this.previewing ? "Edit" : "Preview"
+    }
+    if (this.hasPreviewToggleTarget) {
+      this.previewToggleTarget.setAttribute("aria-label", this.previewing ? "Edit document" : "Preview document")
+      this.previewToggleTarget.setAttribute("aria-pressed", this.previewing ? "true" : "false")
+      this.previewToggleTarget.setAttribute("title", this.previewing ? "Edit document" : "Preview document")
     }
   }
 

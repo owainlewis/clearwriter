@@ -123,6 +123,7 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .app-sidebar__brand:hover { color: var(--cw-ink); text-decoration: none; }
 
 .app-sidebar__top-actions { display: flex; align-items: center; gap: 4px; }
+.app-sidebar__icon-form { margin: 0; display: inline-flex; }
 .app-sidebar__icon-btn {
   display: inline-flex;
   align-items: center;
@@ -140,6 +141,7 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   line-height: 1;
 }
 .app-sidebar__icon-btn:hover { background: var(--cw-line-soft); color: var(--cw-ink); }
+.app-sidebar__icon-btn .cw-icon { width: 15px; height: 15px; }
 
 /* Floating "show sidebar" button — visible only when collapsed.
  * Sits at top-left of the viewport, just above the editor content. */
@@ -320,6 +322,53 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   font-size: 0.85rem;
 }
 .cw-btn--danger:hover { text-decoration: underline; }
+
+.cw-icon-btn-form { margin: 0; display: inline-flex; }
+.cw-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--cw-line);
+  border-radius: 8px;
+  background: var(--cw-surface);
+  color: var(--cw-ink-soft);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+.cw-icon-btn:hover {
+  background: var(--cw-line-soft);
+  color: var(--cw-ink);
+  text-decoration: none;
+}
+.cw-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--cw-clay-soft);
+  border-color: var(--cw-clay);
+}
+.cw-icon-btn--primary {
+  background: var(--cw-clay);
+  border-color: var(--cw-clay);
+  color: #fff;
+}
+.cw-icon-btn--primary:hover {
+  background: var(--cw-clay-deep);
+  border-color: var(--cw-clay-deep);
+  color: #fff;
+}
+.cw-icon-btn--danger {
+  color: #b91c1c;
+  border-color: transparent;
+  background: transparent;
+}
+.cw-icon-btn--danger:hover {
+  background: #fef2f2;
+  border-color: #fee2e2;
+  color: #991b1b;
+}
+.cw-icon-btn .cw-icon { width: 17px; height: 17px; }
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Flash
@@ -704,7 +753,9 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-menu__readout-value:hover { color: var(--cw-link); text-decoration: none; }
 .cw-menu__readout-arrow { opacity: 0.5; font-size: 0.75rem; margin-left: 4px; }
 .cw-menu__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   width: 100%;
   padding: 7px 10px;
   border: none;
@@ -718,6 +769,7 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-menu__item:hover { background: var(--cw-line-soft); color: var(--cw-ink); }
 .cw-menu__item--danger { color: #b91c1c; }
 .cw-menu__item--danger:hover { background: #fef2f2; color: #991b1b; }
+.cw-menu__item .cw-icon { width: 15px; height: 15px; }
 
 
 .cw-editor__title {

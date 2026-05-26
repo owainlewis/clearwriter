@@ -5,7 +5,13 @@
 
   <div class="cw-page__header">
     <h1 class="cw-page__title">Documents</h1>
-    <%= button_to "New document", documents_path, method: :post, class: "cw-btn cw-btn--primary" %>
+    <%= button_to documents_path, method: :post,
+          form_class: "cw-icon-btn-form",
+          class: "cw-icon-btn cw-icon-btn--primary",
+          title: "New document",
+          "aria-label": "New document" do %>
+      <%= icon :plus %>
+    <% end %>
   </div>
 
   <% current_since = params[:since].presence || "7d" %>
