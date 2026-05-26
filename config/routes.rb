@@ -16,14 +16,18 @@ Rails.application.routes.draw do
   end
   resources :collections, only: %i[index show create update destroy] do
     # Add an existing doc to / remove it from a collection (membership only).
-    resources :documents, only: %i[create destroy], controller: "collection_documents"
+    resources :documents, only: %i[create destroy], controller: "collection_documents" do
+      get :search, on: :collection  # typeahead results for the link picker
+    end
   end
   resources :tasks, only: %i[index show create update destroy] do
     collection do
       post :reorder  # drag-and-drop persistence: { status:, ids: [] }
     end
     resources :comments, only: %i[create], controller: "task_comments"
-    resources :documents, only: %i[create destroy], controller: "task_documents"
+    resources :documents, only: %i[create destroy], controller: "task_documents" do
+      get :search, on: :collection  # typeahead results for the link picker
+    end
   end
   resources :tags, only: %i[index]
 

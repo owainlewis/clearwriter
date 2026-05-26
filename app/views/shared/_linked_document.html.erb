@@ -1,0 +1,14 @@
+<%# One linked document row with a hover-revealed unlink action.
+    locals: document, unlink_url %>
+<li id="linked-doc-<%= document.public_token %>" class="cw-doc-list__item cw-doc-list__item--with-action">
+  <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
+    <span class="cw-doc-list__title <%= 'cw-doc-list__title--untitled' if document.title.blank? %>">
+      <%= icon :document, class: "cw-doc-list__icon" %> <%= document.title.presence || "Untitled" %>
+    </span>
+    <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
+  <% end %>
+  <%= button_to unlink_url, method: :delete, class: "cw-row-remove", form_class: "cw-row-action",
+        title: "Unlink document", "aria-label": "Unlink document" do %>
+    <%= icon :close %>
+  <% end %>
+</li>

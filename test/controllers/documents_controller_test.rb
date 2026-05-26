@@ -27,6 +27,28 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "Bob secret"
   end
 
+  test "documents index can render grid cards and preserve filters in view toggle" do
+    card = @alice.documents.create!(
+      body: "# Atomic card\n\nOne idea explained clearly.",
+      tags_text: "lesson"
+    )
+
+    sign_in_as @alice
+    get documents_path(since: "all", tag: "lesson", view: "grid")
+
+    assert_response :success
+    assert_select ".cw-doc-grid"
+    assert_select "a.cw-doc-card[href=?]", edit_document_path(card) do
+      assert_select ".cw-doc-card__title", "Atomic card"
+      assert_select ".cw-doc-card__excerpt", /One idea explained clearly/
+      assert_select ".cw-chip--tag", "lesson"
+    end
+    assert_select "a[href=?].cw-view-toggle__item--active",
+      documents_path(since: "all", tag: "lesson", view: "grid")
+    assert_select "a[href=?]",
+      documents_path(since: "all", tag: "lesson", view: "list")
+  end
+
   test "create yields a blank doc and redirects to edit" do
     sign_in_as @alice
     assert_difference -> { @alice.documents.count }, 1 do

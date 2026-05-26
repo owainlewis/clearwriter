@@ -109,4 +109,25 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     post task_documents_path(@task), params: { document_id: bobs_doc.public_token }
     assert_response :not_found
   end
+
+  test "document search returns matching linkable docs, excluding linked" do
+    sign_in_as @alice
+    findable = @alice.documents.create!(body: "# Findable thumbnail brief")
+    linked = @alice.documents.create!(body: "# Already linked")
+    @task.link_document(linked)
+
+    get search_task_documents_path(@task), params: { q: "Findable" }
+    assert_response :success
+    assert_includes response.body, "Findable thumbnail brief"
+    assert_not_includes response.body, linked.public_token
+  end
+
+  test "linking via turbo_stream streams the row in place" do
+    sign_in_as @alice
+    d = @alice.documents.create!(body: "# Script")
+    post task_documents_path(@task), params: { document_id: d.public_token }, as: :turbo_stream
+    assert_response :success
+    assert_match "linked-doc-#{d.public_token}", response.body
+    assert_includes @task.reload.documents, d
+  end
 end

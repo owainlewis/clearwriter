@@ -1,6 +1,5 @@
 <%
   total_docs = Current.user.documents.count
-  collections = Current.user.collections.ordered.limit(20)
 
   # Which resource "tab" is active, so its sidebar header highlights. Tags
   # filter documents, so they count as the Documents tab.
@@ -39,9 +38,8 @@
       </div>
     </div>
 
-    <%# Documents has no list here on purpose: there can be hundreds, so the
-        index page is the place to browse them. Collections are project
-        bundles — few enough to list for quick access. %>
+    <%# No per-resource lists here on purpose: Documents and Collections can
+        each grow large, so their index pages are the place to browse them. %>
     <section class="app-sidebar__section">
       <%= link_to documents_path, class: "app-sidebar__tab #{'app-sidebar__tab--active' if docs_active}" do %>
         <%= icon :document, class: "app-sidebar__tab-icon" %>
@@ -53,24 +51,10 @@
         <span class="app-sidebar__tab-label">Tasks</span>
         <span class="app-sidebar__tab-count"><%= Current.user.tasks.count %></span>
       <% end %>
-    </section>
-
-    <section class="app-sidebar__section">
       <%= link_to collections_path, class: "app-sidebar__tab #{'app-sidebar__tab--active' if collections_active}" do %>
         <%= icon :collection, class: "app-sidebar__tab-icon" %>
         <span class="app-sidebar__tab-label">Collections</span>
         <span class="app-sidebar__tab-count"><%= Current.user.collections.count %></span>
-      <% end %>
-      <% if collections.any? %>
-        <ul class="app-sidebar__list">
-          <% collections.each do |collection| %>
-            <li>
-              <%= link_to collection_path(collection), class: "app-sidebar__item" do %>
-                <span class="app-sidebar__item-title"><%= collection.display_name %></span>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
       <% end %>
     </section>
 

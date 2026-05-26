@@ -34,40 +34,17 @@
     <div class="cw-section__head">
       <h2 class="cw-section__title">Documents</h2>
     </div>
-    <% if @documents.empty? %>
-      <p class="cw-empty">No documents in this collection yet.</p>
-    <% else %>
-      <ul class="cw-doc-list">
-        <% @documents.each do |document| %>
-          <li class="cw-doc-list__item cw-doc-list__item--with-action">
-            <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
-              <span class="cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}">
-                <%= icon :document, class: "cw-doc-list__icon" %> <%= document.title.presence || "Untitled" %>
-              </span>
-              <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
-            <% end %>
-            <%= button_to collection_document_path(@collection, document), method: :delete,
-                  class: "cw-row-remove", form_class: "cw-row-action",
-                  title: "Remove from collection", "aria-label": "Remove from collection" do %>
-              <%= icon :close %>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% end %>
-  </section>
 
-  <% if @addable_documents.any? %>
-    <section class="cw-section">
-      <div class="cw-section__head">
-        <h2 class="cw-section__title">Add a document</h2>
-      </div>
-      <%= form_with url: collection_documents_path(@collection), method: :post, class: "cw-picker" do |f| %>
-        <%= f.select :document_id,
-              @addable_documents.map { |d| [ d.title.presence || "Untitled", d.public_token ] },
-              {}, class: "cw-input" %>
-        <%= f.submit "Add", class: "cw-btn cw-btn--primary" %>
+    <%= render "shared/document_picker",
+          search_url: search_collection_documents_path(@collection),
+          placeholder: "Search documents to add…" %>
+
+    <ul id="linked-docs" class="cw-doc-list">
+      <% @documents.each do |document| %>
+        <%= render "shared/linked_document", document: document,
+              unlink_url: collection_document_path(@collection, document) %>
       <% end %>
-    </section>
-  <% end %>
+    </ul>
+    <p id="linked-docs-empty" class="cw-empty" <%= "hidden" if @documents.any? %>>No documents in this collection yet.</p>
+  </section>
 </div>

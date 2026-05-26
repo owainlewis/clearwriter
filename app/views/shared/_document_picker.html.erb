@@ -1,0 +1,16 @@
+<%# A search-driven document picker. Type to filter; click or press Enter on a
+    result to link it (the result's Turbo form streams the change in place).
+    locals: search_url, placeholder %>
+<div class="picker" data-controller="combobox" data-combobox-url-value="<%= search_url %>">
+  <div class="picker__field">
+    <%= icon :search, class: "picker__icon" %>
+    <input type="text"
+           class="picker__input"
+           placeholder="<%= placeholder %>"
+           autocomplete="off"
+           spellcheck="false"
+           data-combobox-target="input"
+           data-action="input->combobox#search focus->combobox#open keydown->combobox#keydown">
+  </div>
+  <div class="picker__menu" data-combobox-target="menu" hidden></div>
+</div>
