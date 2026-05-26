@@ -46,6 +46,27 @@ class CollectionsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "In the bundle"
   end
 
+  test "show renders member documents in grid view and omits collection breadcrumb" do
+    doc = @alice.documents.create!(body: "# Card resource\n\nA reusable card body.", tags_text: "lesson")
+    @collection.add_document(doc)
+
+    sign_in_as @alice
+    get collection_path(@collection, view: "grid")
+
+    assert_response :success
+    assert_select ".cw-back-link", count: 0
+    assert_select ".cw-doc-grid"
+    assert_select "a.cw-doc-card[href=?]", edit_document_path(doc) do
+      assert_select ".cw-doc-card__title", "Card resource"
+      assert_select ".cw-doc-card__excerpt", /A reusable card body/
+      assert_select ".cw-chip--tag", "lesson"
+    end
+    assert_select "a[href=?].cw-view-toggle__item--active",
+      collection_path(@collection, view: "grid")
+    assert_select "a[href=?]",
+      collection_path(@collection, view: "list")
+  end
+
   test "update renames the collection" do
     sign_in_as @alice
     patch collection_path(@collection), params: { collection: { name: "Renamed" } }

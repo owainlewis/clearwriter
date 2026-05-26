@@ -4,9 +4,7 @@
   <% end %>
 
   <div class="cw-page__header cw-page__header--detail">
-    <%= link_to collections_path, class: "cw-back-link" do %>
-      <%= icon :collection %> Collections
-    <% end %>
+    <span></span>
     <%= button_to collection_path(@collection), method: :delete,
           form: { data: { turbo_confirm: "Delete this collection? The documents are kept." } },
           form_class: "cw-icon-btn-form",
@@ -33,21 +31,72 @@
     <button type="button" class="cw-btn cw-btn--ghost" data-action="reveal#toggle">Cancel</button>
   <% end %>
 
+  <% current_view = params[:view] == "grid" ? "grid" : "list" %>
   <section class="cw-section">
     <div class="cw-section__head">
       <h2 class="cw-section__title">Documents</h2>
+      <span class="cw-view-toggle" aria-label="Collection document view">
+        <%= link_to collection_path(@collection, view: "list"),
+              class: "cw-view-toggle__item #{'cw-view-toggle__item--active' if current_view == 'list'}",
+              title: "List view",
+              "aria-label": "List view",
+              "aria-current": ("page" if current_view == "list") do %>
+          <%= icon :list %>
+        <% end %>
+        <%= link_to collection_path(@collection, view: "grid"),
+              class: "cw-view-toggle__item #{'cw-view-toggle__item--active' if current_view == 'grid'}",
+              title: "Grid view",
+              "aria-label": "Grid view",
+              "aria-current": ("page" if current_view == "grid") do %>
+          <%= icon :grid %>
+        <% end %>
+      </span>
     </div>
 
     <%= render "shared/document_picker",
           search_url: search_collection_documents_path(@collection),
           placeholder: "Search documents to add…" %>
 
-    <ul id="linked-docs" class="cw-doc-list">
-      <% @documents.each do |document| %>
-        <%= render "shared/linked_document", document: document,
-              unlink_url: collection_document_path(@collection, document) %>
+    <% if @documents.any? %>
+      <% if current_view == "grid" %>
+        <div id="linked-docs" class="cw-doc-grid">
+          <% @documents.each do |document| %>
+            <div id="linked-doc-<%= document.public_token %>" class="cw-doc-card-wrap">
+              <%= link_to edit_document_path(document), class: "cw-doc-card" do %>
+                <span class="cw-doc-card__title #{'cw-doc-card__title--untitled' if document.title.blank?}">
+                  <%= document.title.presence || "Untitled" %>
+                </span>
+                <span class="cw-doc-card__excerpt"><%= truncate(document_card_excerpt(document), length: 190, separator: " ") %></span>
+                <span class="cw-doc-card__meta">
+                  <span><%= document.updated_at.strftime("%b %-d") %></span>
+                  <% if document.tags.any? %>
+                    <span class="cw-doc-card__tags">
+                      <% document.tags.first(3).each do |tag| %>
+                        <span class="cw-chip cw-chip--tag"><%= tag %></span>
+                      <% end %>
+                    </span>
+                  <% end %>
+                </span>
+              <% end %>
+              <%= button_to collection_document_path(@collection, document), method: :delete,
+                    class: "cw-card-remove",
+                    form_class: "cw-card-action",
+                    title: "Unlink document",
+                    "aria-label": "Unlink document" do %>
+                <%= icon :close %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <ul id="linked-docs" class="cw-doc-list">
+          <% @documents.each do |document| %>
+            <%= render "shared/linked_document", document: document,
+                  unlink_url: collection_document_path(@collection, document) %>
+          <% end %>
+        </ul>
       <% end %>
-    </ul>
+    <% end %>
     <p id="linked-docs-empty" class="cw-empty" <%= "hidden" if @documents.any? %>>No documents in this collection yet.</p>
   </section>
 </div>

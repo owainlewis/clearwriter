@@ -633,10 +633,48 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   gap: 4px;
   min-width: 0;
 }
+.cw-doc-card-wrap {
+  position: relative;
+}
+.cw-doc-card-wrap .cw-doc-card {
+  height: 100%;
+}
+.cw-card-action {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  margin: 0;
+}
+.cw-card-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--cw-faint);
+  cursor: pointer;
+  opacity: 0;
+  box-shadow: 0 1px 3px rgba(31, 41, 55, 0.08);
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.cw-doc-card-wrap:hover .cw-card-remove,
+.cw-card-remove:focus-visible {
+  opacity: 1;
+}
+.cw-card-remove:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.cw-card-remove .cw-icon { width: 15px; height: 15px; }
 
 @media (max-width: 640px) {
   .cw-view-toggle { margin-left: 0; }
   .cw-doc-grid { grid-template-columns: 1fr; }
+  .cw-card-remove { opacity: 1; }
 }
 
 /* ──────────────────────────────────────────────────────────────────────
