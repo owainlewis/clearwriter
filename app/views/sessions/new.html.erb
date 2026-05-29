@@ -14,7 +14,7 @@
 
       <h1 class="cw-auth__title">Sign in</h1>
 
-      <%= form_with url: session_url, class: "contents" do |form| %>
+      <%= form_with url: session_path, class: "contents" do |form| %>
         <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "Email address", value: params[:email_address], class: "cw-auth__field" %>
         <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Password", maxlength: 72, class: "cw-auth__field" %>
         <%= form.submit "Sign in", class: "cw-btn cw-btn--primary cw-auth__submit" %>
@@ -22,7 +22,6 @@
 
       <div class="cw-auth__links">
         <%= link_to "Forgot password?", new_password_path %>
-        <%= link_to "Sign up", new_registration_path %>
       </div>
     </div>
   </div>

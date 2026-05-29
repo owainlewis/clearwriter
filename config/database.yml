@@ -79,16 +79,10 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
+  primary:
     <<: *default
-    database: pair_production
-    username: pair
-    password: <%= ENV["PAIR_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: pair_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: pair_production_queue
-    migrations_paths: db/queue_migrate
+    database: <%= ENV.fetch("DB_NAME", "pair_production") %>
+    username: <%= ENV.fetch("DB_USER", "pair") %>
+    password: <%= ENV["DB_PASSWORD"] || ENV["PAIR_DATABASE_PASSWORD"] %>
+    host: <%= ENV["DB_HOST"] %>
+    port: <%= ENV["DB_PORT"] %>

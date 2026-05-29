@@ -5,6 +5,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get new_session_path
     assert_response :success
     assert_includes response.body, "Sign in"
+    assert_select "form[action=?]", session_path
+    assert_select "a[href=?]", new_registration_path, count: 0
   end
 
   test "POST /sign_in with correct credentials redirects and sets session cookie" do
