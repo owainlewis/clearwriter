@@ -81,7 +81,7 @@ const SAVE_DEBOUNCE_MS = 800
 const MAX_BACKOFF_MS = 60_000
 
 export default class extends Controller {
-  static targets = ["textarea", "tags", "status", "fallbackSave", "editorPane", "previewPane", "previewToggle", "previewToggleLabel"]
+  static targets = ["textarea", "tags", "status", "fallbackSave", "editorPane", "previewPane", "previewToggle", "previewToggleLabel", "copyButton", "copyLabel"]
   static values = { url: String, previewUrl: String, initialPreview: Boolean }
 
   connect() {
@@ -154,6 +154,48 @@ export default class extends Controller {
       window.removeEventListener("keydown", this.boundKeydown)
       this.boundKeydown = null
     }
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer)
+      this.copyTimer = null
+    }
+  }
+
+  // Copy the document to the clipboard, matching the current view: the raw
+  // markdown source in edit mode, or rich text (with a plain-text fallback) when
+  // viewing the rendered preview.
+  async copy() {
+    try {
+      if (this.previewing && this.hasPreviewPaneTarget) {
+        const html = this.previewPaneTarget.innerHTML
+        const text = this.previewPaneTarget.innerText
+        if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "text/html": new Blob([html], { type: "text/html" }),
+              "text/plain": new Blob([text], { type: "text/plain" })
+            })
+          ])
+        } else {
+          await navigator.clipboard.writeText(text)
+        }
+      } else {
+        await navigator.clipboard.writeText(this.textareaTarget.value)
+      }
+      this.flashCopied()
+    } catch (error) {
+      console.error("Copy failed", error)
+    }
+  }
+
+  flashCopied() {
+    if (!this.hasCopyButtonTarget) return
+    this.copyButtonTarget.classList.add("copied")
+    if (this.hasCopyLabelTarget) this.copyLabelTarget.textContent = "Copied"
+    clearTimeout(this.copyTimer)
+    this.copyTimer = setTimeout(() => {
+      this.copyButtonTarget.classList.remove("copied")
+      if (this.hasCopyLabelTarget) this.copyLabelTarget.textContent = "Copy"
+    }, 1500)
   }
 
   onKeydown(event) {

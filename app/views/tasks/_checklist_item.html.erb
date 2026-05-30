@@ -1,0 +1,17 @@
+<li id="checklist-item-<%= item.public_token %>" class="checklist__item <%= 'checklist__item--done' if item.done %>">
+  <%= button_to task_checklist_item_path(task, item), method: :patch,
+        params: { task_checklist_item: { done: !item.done } },
+        form_class: "checklist__check-form",
+        class: "checklist__check",
+        title: item.done ? "Mark as not done" : "Mark as done",
+        "aria-label": item.done ? "Mark as not done" : "Mark as done",
+        "aria-pressed": item.done do %>
+    <%= icon :check, class: "checklist__check-mark" %>
+  <% end %>
+  <span class="checklist__text"><%= item.content %></span>
+  <%= button_to task_checklist_item_path(task, item), method: :delete,
+        form_class: "cw-row-action", class: "cw-row-remove",
+        title: "Remove step", "aria-label": "Remove step" do %>
+    <%= icon :close %>
+  <% end %>
+</li>

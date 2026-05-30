@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_25_152416) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_30_143000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,6 +73,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_25_152416) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "task_checklist_items", force: :cascade do |t|
+    t.string "content", default: "", null: false
+    t.datetime "created_at", null: false
+    t.boolean "done", default: false, null: false
+    t.integer "position", default: 0, null: false
+    t.string "public_token", null: false
+    t.bigint "task_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["public_token"], name: "index_task_checklist_items_on_public_token", unique: true
+    t.index ["task_id", "position"], name: "index_task_checklist_items_on_task_id_and_position"
+    t.index ["task_id"], name: "index_task_checklist_items_on_task_id"
+  end
+
   create_table "task_comments", force: :cascade do |t|
     t.string "author_kind", default: "human", null: false
     t.string "author_name"
@@ -122,6 +135,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_25_152416) do
   add_foreign_key "collections", "users"
   add_foreign_key "documents", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "task_checklist_items", "tasks"
   add_foreign_key "task_comments", "tasks"
   add_foreign_key "task_documents", "documents"
   add_foreign_key "task_documents", "tasks"

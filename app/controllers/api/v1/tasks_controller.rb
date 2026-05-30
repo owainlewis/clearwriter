@@ -49,11 +49,23 @@ module Api
           updated_at: task.updated_at,
           created_at: task.created_at
         }
+        done, total = task.checklist_progress
+        json[:checklist_summary] = { done: done, total: total }
         if detail
           json[:comments] = task.task_comments.map { |c| comment_json(c) }
           json[:documents] = task.documents.map { |d| document_json(d) }
+          json[:checklist] = task.checklist_items.map { |i| checklist_item_json(i) }
         end
         json
+      end
+
+      def checklist_item_json(item)
+        {
+          id: item.public_token,
+          content: item.content,
+          done: item.done,
+          position: item.position
+        }
       end
 
       def comment_json(comment)

@@ -1,0 +1,28 @@
+<section id="checklist" class="cw-section">
+  <% done, total = task.checklist_progress %>
+  <div class="cw-section__head">
+    <h2 class="cw-section__title">Checklist</h2>
+    <% if total.positive? %>
+      <span class="checklist__progress <%= 'checklist__progress--complete' if done == total %>"><%= done %>/<%= total %></span>
+    <% end %>
+  </div>
+
+  <% if total.positive? %>
+    <div class="checklist__bar" aria-hidden="true">
+      <span class="checklist__bar-fill" style="width: <%= (done.to_f / total * 100).round %>%"></span>
+    </div>
+  <% end %>
+
+  <ul class="checklist" id="checklist-items">
+    <% task.checklist_items.each do |item| %>
+      <%= render "tasks/checklist_item", task: task, item: item %>
+    <% end %>
+  </ul>
+
+  <%= form_with url: task_checklist_items_path(task), scope: :task_checklist_item,
+        method: :post, class: "checklist__add" do |f| %>
+    <%= f.text_field :content, placeholder: "Add a step…", autocomplete: "off",
+          class: "cw-input checklist__add-input" %>
+    <%= f.submit "Add", class: "cw-btn cw-btn--ghost cw-btn--sm" %>
+  <% end %>
+</section>

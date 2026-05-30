@@ -273,7 +273,7 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 
 .cw-page__header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 28px;
@@ -294,14 +294,22 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: 7px;
   font-size: 0.92rem;
   font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.cw-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--cw-clay-soft);
+  border-color: var(--cw-clay-line);
 }
 .cw-btn--primary {
   background: var(--cw-clay);
@@ -309,11 +317,57 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 }
 .cw-btn--primary:hover { background: var(--cw-clay-deep); text-decoration: none; }
 .cw-btn--ghost {
-  background: transparent;
+  background: var(--cw-surface);
   color: var(--cw-ink-soft);
   border-color: var(--cw-line);
 }
-.cw-btn--ghost:hover { background: var(--cw-line-soft); color: var(--cw-ink); text-decoration: none; }
+.cw-btn--ghost:hover { background: var(--cw-line-soft); color: var(--cw-ink); border-color: var(--cw-line); text-decoration: none; }
+.cw-btn .cw-icon { width: 15px; height: 15px; }
+
+/* "Create" action — a quiet paper pill with the plus set in a clay disc, so the
+   accent reads as a small jewel rather than a heavy filled block. */
+.cw-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 15px 5px 6px;
+  border-radius: 999px;
+  font-family: var(--cw-font-ui);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--cw-ink);
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+.cw-create-btn__disc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--cw-clay);
+  color: #fff;
+  transition: background 0.16s ease, transform 0.16s ease;
+}
+.cw-create-btn__disc .cw-icon { width: 13px; height: 13px; }
+.cw-create-btn:hover {
+  border-color: var(--cw-clay-line);
+  box-shadow: 0 3px 10px -5px rgba(180, 84, 31, 0.4);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.cw-create-btn:hover .cw-create-btn__disc { background: var(--cw-clay-deep); transform: scale(1.08); }
+.cw-create-btn:active { transform: translateY(0); box-shadow: none; }
+.cw-create-btn:focus-visible {
+  outline: none;
+  border-color: var(--cw-clay);
+  box-shadow: 0 0 0 3px var(--cw-clay-soft);
+}
 .cw-btn--danger {
   background: transparent;
   color: #b91c1c;
@@ -939,10 +993,40 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 22px;
   font-size: 0.88rem;
 }
+
+/* Segmented control — a grouped set of mutually-exclusive options sharing one
+   pill housing (date filters, etc.). Pairs visually with .cw-view-toggle. */
+.cw-segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--cw-line);
+  border-radius: 9px;
+  background: var(--cw-surface);
+}
+.cw-segmented__item {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 13px;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--cw-muted);
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.cw-segmented__item:hover { color: var(--cw-ink); text-decoration: none; }
+.cw-segmented__item--active { background: var(--cw-ink); color: #fff; }
+.cw-segmented__item--active:hover { color: #fff; }
+
+.cw-chip--removable { display: inline-flex; align-items: center; gap: 5px; }
+.cw-chip__remove { color: var(--cw-faint); font-size: 1.05em; line-height: 1; }
+.cw-chip--removable:hover .cw-chip__remove { color: var(--cw-ink); }
 .cw-chip {
   display: inline-block;
   padding: 4px 12px;
@@ -969,19 +1053,20 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-view-toggle {
   display: inline-flex;
   align-items: center;
+  gap: 2px;
   margin-left: auto;
   padding: 2px;
   border: 1px solid var(--cw-line);
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--cw-surface);
 }
 .cw-view-toggle__item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 28px;
-  border-radius: 6px;
+  width: 32px;
+  height: 30px;
+  border-radius: 7px;
   color: var(--cw-muted);
 }
 .cw-view-toggle__item:hover {
@@ -1182,6 +1267,13 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.45; transform: scale(0.82); }
 }
+
+/* Copy button — shows the copy glyph normally, swaps to a green check on success.
+   Scoped to .cw-btn so these win over the later base `.cw-icon { display }` rule. */
+.cw-btn .cw-editor__copy-check { display: none; }
+.cw-btn.copied { color: #10b981; border-color: rgba(16, 185, 129, 0.4); }
+.cw-btn.copied .cw-editor__copy-glyph { display: none; }
+.cw-btn.copied .cw-editor__copy-check { display: inline-block; }
 
 /* Subtle footer beneath the editor — word count, anchored bottom-right. */
 .cw-editor__footer {
@@ -1985,9 +2077,93 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
  *  Task detail
  * ────────────────────────────────────────────────────────────────────── */
 
-.task-edit { display: flex; flex-direction: column; gap: 14px; margin-bottom: 8px; }
-.task-edit__title { width: 100%; }
-.task-edit__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.task-edit { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+/* Title reads as a heading, not a form field — chrome appears only on focus. */
+.task-edit__title {
+  width: 100%;
+  border-color: transparent;
+  background: transparent;
+  padding-left: 2px;
+}
+.task-edit__title:hover { border-color: var(--cw-line); }
+.task-edit__actions { width: 100%; display: flex; justify-content: flex-end; }
+
+/* Task detail runs tighter than the default section rhythm so it doesn't feel
+   sparse with short content. */
+.cw-page--task .cw-section { margin-top: 22px; }
+.cw-page--task .task-edit { gap: 10px; }
+
+/* ──────────────────────────────────────────────────────────────────────
+ *  Task checklist — steps an agent ticks off to verify its work
+ * ────────────────────────────────────────────────────────────────────── */
+
+.checklist__progress {
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--cw-muted);
+}
+.checklist__progress--complete { color: #3a6b52; }
+
+.checklist__bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--cw-line);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.checklist__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cw-clay);
+  transition: width 0.25s ease;
+}
+
+.checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.checklist__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 4px;
+  border-bottom: 1px solid var(--cw-line-soft);
+}
+.checklist__item:first-child { border-top: 1px solid var(--cw-line-soft); }
+
+/* The checkbox is a button_to form; strip its wrapper and style the button. */
+.checklist__check-form { margin: 0; display: inline-flex; }
+.checklist__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1.5px solid var(--cw-faint);
+  border-radius: 6px;
+  background: var(--cw-surface);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.checklist__check:hover { border-color: var(--cw-clay); }
+.checklist__check-mark { width: 13px; height: 13px; opacity: 0; }
+.checklist__item--done .checklist__check {
+  background: var(--cw-clay);
+  border-color: var(--cw-clay);
+}
+.checklist__item--done .checklist__check-mark { opacity: 1; }
+
+.checklist__text { flex: 1; font-size: 0.92rem; color: var(--cw-ink); line-height: 1.45; }
+.checklist__item--done .checklist__text { color: var(--cw-muted); text-decoration: line-through; }
+
+.checklist__item .cw-row-remove { flex-shrink: 0; }
+.checklist__item:hover .cw-row-remove,
+.checklist__item:focus-within .cw-row-remove { opacity: 1; }
+
+.checklist__add { display: flex; gap: 8px; margin-top: 12px; }
+.checklist__add-input { flex: 1; }
 
 /* Read-only status indicator. Status is changed by dragging the card on the
    board, so the detail view just shows where the task currently sits. */
@@ -2085,7 +2261,7 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-field { display: flex; flex-direction: column; gap: 6px; }
 .cw-field__label { font-size: 0.82rem; font-weight: 600; color: var(--cw-ink-soft); }
 
-.comment-list { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.comment-list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .comment {
   border: 1px solid var(--cw-line);
   border-radius: 10px;
@@ -2110,8 +2286,9 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .comment__body p { margin: 0 0 6px; }
 .comment__body p:last-child { margin-bottom: 0; }
 
-.comment-form { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.comment-form { display: flex; flex-direction: column; gap: 8px; }
 .comment-form__input { width: 100%; font-family: var(--cw-font-ui); line-height: 1.55; resize: vertical; }
+.comment-form__actions { display: flex; justify-content: flex-end; }
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Helpers

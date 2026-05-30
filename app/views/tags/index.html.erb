@@ -1,7 +1,7 @@
 <div class="cw-page">
   <div class="cw-page__header">
     <h1 class="cw-page__title">Tags</h1>
-    <%= link_to "← Documents", documents_path %>
+    <%= link_to "← Documents", documents_path, class: "cw-back-link" %>
   </div>
 
   <% if @tag_counts.empty? %>
