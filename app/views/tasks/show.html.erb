@@ -1,4 +1,4 @@
-<div class="cw-page cw-page--wide">
+<div class="cw-page cw-page--wide cw-page--task">
   <% if notice = flash[:notice] %>
     <p class="cw-flash cw-flash--notice"><%= notice %></p>
   <% end %>
@@ -23,12 +23,14 @@
     <span class="task-status task-status--<%= @task.status %>">
       <span class="task-status__dot"></span><%= Task::STATUS_LABELS[@task.status] %>
     </span>
-    <%= f.text_area :description, value: @task.description, rows: 5,
+    <%= f.text_area :description, value: @task.description, rows: 3,
           placeholder: "Add a description…", class: "cw-input task-edit__description" %>
     <div class="task-edit__actions">
       <%= f.submit "Save", class: "cw-btn cw-btn--primary cw-btn--sm" %>
     </div>
   <% end %>
+
+  <%= render "tasks/checklist", task: @task %>
 
   <section class="cw-section">
     <div class="cw-section__head"><h2 class="cw-section__title">Linked documents</h2></div>
@@ -43,11 +45,18 @@
               unlink_url: task_document_path(@task, document) %>
       <% end %>
     </ul>
-    <p id="linked-docs-empty" class="cw-empty" <%= "hidden" if @documents.any? %>>No documents linked yet.</p>
   </section>
 
   <section class="cw-section">
     <div class="cw-section__head"><h2 class="cw-section__title">Activity</h2></div>
+
+    <%= form_with url: task_comments_path(@task), scope: :task_comment, method: :post, class: "comment-form" do |f| %>
+      <%= f.text_area :body, rows: 2, placeholder: "Add a comment…", class: "cw-input comment-form__input" %>
+      <div class="comment-form__actions">
+        <%= f.submit "Comment", class: "cw-btn cw-btn--primary cw-btn--sm" %>
+      </div>
+    <% end %>
+
     <% if @task.task_comments.any? %>
       <ul class="comment-list">
         <% @task.task_comments.each do |comment| %>
@@ -61,13 +70,6 @@
           </li>
         <% end %>
       </ul>
-    <% else %>
-      <p class="cw-empty">No activity yet. An agent's comments will appear here.</p>
-    <% end %>
-
-    <%= form_with url: task_comments_path(@task), scope: :task_comment, method: :post, class: "comment-form" do |f| %>
-      <%= f.text_area :body, rows: 2, placeholder: "Add a comment…", class: "cw-input comment-form__input" %>
-      <%= f.submit "Comment", class: "cw-btn cw-btn--primary" %>
     <% end %>
   </section>
 </div>

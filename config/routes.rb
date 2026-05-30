@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     resources :documents, only: %i[create destroy], controller: "task_documents" do
       get :search, on: :collection  # typeahead results for the link picker
     end
+    resources :checklist_items, only: %i[create update destroy], controller: "task_checklist_items"
   end
   resources :tags, only: %i[index]
 
@@ -51,6 +52,8 @@ Rails.application.routes.draw do
         # Agents comment on a task and link documents they produced for it.
         resources :comments, only: %i[create], controller: "task_comments"
         resources :documents, only: %i[create destroy], controller: "task_documents"
+        # Agents tick off checklist steps to confirm their work is complete.
+        resources :checklist_items, only: %i[index create update destroy], controller: "task_checklist_items"
       end
     end
   end

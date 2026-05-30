@@ -15,6 +15,9 @@ class Task < ApplicationRecord
   has_many :task_comments, -> { order(:created_at) }, dependent: :destroy
   has_many :task_documents, dependent: :destroy
   has_many :documents, through: :task_documents
+  # An ordered checklist agents tick off to verify each step is done.
+  has_many :checklist_items, -> { order(:position, :created_at) },
+           class_name: "TaskChecklistItem", dependent: :destroy
 
   normalizes :title, with: ->(t) { t.to_s.strip }
 
@@ -26,6 +29,13 @@ class Task < ApplicationRecord
 
   def display_title
     title.presence || TITLE_FALLBACK
+  end
+
+  # [done, total] for the checklist. Uses the loaded association so the show
+  # page and turbo refreshes don't fire extra count queries.
+  def checklist_progress
+    items = checklist_items.to_a
+    [ items.count(&:done), items.size ]
   end
 
   # Links a document to this task (idempotent).
