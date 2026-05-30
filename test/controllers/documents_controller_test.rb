@@ -49,6 +49,32 @@ class DocumentsControllerTest < ActionDispatch::IntegrationTest
       documents_path(since: "all", tag: "lesson", view: "list")
   end
 
+  test "pinned docs sort to the top of the list regardless of recency" do
+    # @doc ("Alice doc") is created first, so it's the older of the two.
+    newer = @alice.documents.create!(body: "# Newer doc")
+    @doc.update!(pinned: true)
+
+    sign_in_as @alice
+    get documents_path(since: "all")
+
+    assert_response :success
+    pinned_at  = response.body.index("Alice doc")
+    unpinned_at = response.body.index("Newer doc")
+    assert pinned_at < unpinned_at, "pinned doc should render before the more recent unpinned doc"
+  end
+
+  test "pinned docs stay visible even when older than the date filter" do
+    travel_to 60.days.ago do
+      @old = @alice.documents.create!(body: "# Old but pinned", pinned: true)
+    end
+
+    sign_in_as @alice
+    get documents_path(since: "7d")
+
+    assert_response :success
+    assert_includes response.body, "Old but pinned"
+  end
+
   test "create yields a blank doc and redirects to edit" do
     sign_in_as @alice
     assert_difference -> { @alice.documents.count }, 1 do
