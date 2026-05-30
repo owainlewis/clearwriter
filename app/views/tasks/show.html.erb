@@ -20,14 +20,14 @@
   <%= form_with url: task_path(@task), scope: :task, method: :patch, class: "task-edit" do |f| %>
     <%= f.text_field :title, value: @task.title, placeholder: Task::TITLE_FALLBACK,
           class: "cw-input cw-input--title task-edit__title", required: true %>
-    <div class="task-edit__row">
-      <span class="task-status task-status--<%= @task.status %>">
-        <span class="task-status__dot"></span><%= Task::STATUS_LABELS[@task.status] %>
-      </span>
-      <%= f.submit "Save", class: "cw-btn cw-btn--ghost cw-btn--sm" %>
-    </div>
+    <span class="task-status task-status--<%= @task.status %>">
+      <span class="task-status__dot"></span><%= Task::STATUS_LABELS[@task.status] %>
+    </span>
     <%= f.text_area :description, value: @task.description, rows: 5,
           placeholder: "Add a description…", class: "cw-input task-edit__description" %>
+    <div class="task-edit__actions">
+      <%= f.submit "Save", class: "cw-btn cw-btn--primary cw-btn--sm" %>
+    </div>
   <% end %>
 
   <section class="cw-section">

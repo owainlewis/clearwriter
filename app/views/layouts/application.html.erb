@@ -29,10 +29,24 @@
     </script>
   </head>
 
-  <body class="<%= authenticated? ? 'app-shell' : 'app-shell--plain' %>">
+  <body class="<%= authenticated? ? 'app-shell' : 'app-shell--plain' %>"
+        <%= 'data-controller="shortcuts"'.html_safe if authenticated? %>>
     <% if authenticated? %>
       <%= render "layouts/sidebar" %>
       <main class="app-main"><%= yield %></main>
+
+      <%# Hidden targets for the global "new" keyboard shortcuts (n d / n t / n c). %>
+      <%= form_with url: documents_path, method: :post, class: "cw-hidden",
+            data: { shortcuts_target: "document" } do %><% end %>
+      <%= form_with url: tasks_path, scope: :task, method: :post, class: "cw-hidden",
+            data: { shortcuts_target: "task" } do |f| %>
+        <%= f.hidden_field :title, value: "" %>
+        <%= f.hidden_field :status, value: "todo" %>
+      <% end %>
+      <%= form_with url: collections_path, scope: :collection, method: :post, class: "cw-hidden",
+            data: { shortcuts_target: "collection" } do |f| %>
+        <%= f.hidden_field :name, value: "" %>
+      <% end %>
     <% else %>
       <main class="app-main app-main--plain"><%= yield %></main>
     <% end %>

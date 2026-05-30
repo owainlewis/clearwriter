@@ -12,6 +12,16 @@
     <div class="cw-editor__bar-right">
       <button type="button"
               class="cw-btn cw-btn--ghost cw-btn--sm"
+              data-editor-target="copyButton"
+              data-action="editor#copy"
+              aria-label="Copy document">
+        <%= icon :copy, class: "cw-editor__copy-glyph" %>
+        <%= icon :check, class: "cw-editor__copy-check" %>
+        <span data-editor-target="copyLabel">Copy</span>
+      </button>
+
+      <button type="button"
+              class="cw-btn cw-btn--ghost cw-btn--sm"
               data-editor-target="previewToggle"
               data-action="editor#togglePreview"
               aria-label="<%= initial_preview ? "Edit document" : "Preview document" %>"

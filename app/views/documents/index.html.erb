@@ -5,26 +5,23 @@
 
   <div class="cw-page__header">
     <h1 class="cw-page__title">Documents</h1>
-    <%= button_to documents_path, method: :post,
-          form_class: "cw-icon-btn-form",
-          class: "cw-icon-btn cw-icon-btn--primary",
-          title: "New document",
-          "aria-label": "New document" do %>
-      <%= icon :plus %>
-    <% end %>
   </div>
 
   <% current_since = params[:since].presence || "7d" %>
   <% current_view = params[:view] == "grid" ? "grid" : "list" %>
   <nav class="cw-filters">
-    <% [["7d", "Last 7 days"], ["30d", "Last 30 days"], ["all", "All"]].each do |val, label| %>
-      <% active = current_since == val %>
-      <%= link_to label, documents_path(since: val, tag: @tag, view: current_view),
-            class: "cw-chip #{'cw-chip--active' if active}" %>
-    <% end %>
+    <span class="cw-segmented" aria-label="Filter by date">
+      <% [["7d", "Last 7 days"], ["30d", "Last 30 days"], ["all", "All"]].each do |val, label| %>
+        <% active = current_since == val %>
+        <%= link_to label, documents_path(since: val, tag: @tag, view: current_view),
+              class: "cw-segmented__item #{'cw-segmented__item--active' if active}",
+              "aria-current": ("page" if active) %>
+      <% end %>
+    </span>
     <% if @tag %>
-      <span style="margin-left: 8px; color: var(--cw-muted);">Tag:</span>
-      <%= link_to "#{@tag} ✕", documents_path(since: current_since, view: current_view), class: "cw-chip cw-chip--active" %>
+      <%= link_to documents_path(since: current_since, view: current_view), class: "cw-chip cw-chip--tag cw-chip--removable" do %>
+        <%= @tag %><span class="cw-chip__remove" aria-hidden="true">×</span>
+      <% end %>
     <% end %>
 
     <span class="cw-view-toggle" aria-label="Document view">

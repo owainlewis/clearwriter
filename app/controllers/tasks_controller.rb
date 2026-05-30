@@ -15,8 +15,10 @@ class TasksController < ApplicationController
   end
 
   def create
-    Current.user.tasks.create!(task_create_params)
-    redirect_to tasks_path
+    task = Current.user.tasks.create!(task_create_params)
+    # Quick-create (e.g. the "n t" shortcut) sends no title — open the new task
+    # so it can be filled in. Board column adds carry a title and stay on the board.
+    redirect_to task.title.blank? ? task_path(task) : tasks_path
   end
 
   def update
