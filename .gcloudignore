@@ -1,0 +1,22 @@
+# Keep Cloud Run source uploads small without dropping assets the Docker build needs.
+/.git/
+/.gitignore
+
+/.bundle
+/.env*
+
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+/public/assets
+/config/master.key
+/config/credentials/*.key
+/vendor/bundle/
+/.claude/
