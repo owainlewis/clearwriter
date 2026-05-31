@@ -2226,6 +2226,30 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .task-status--doing  .task-status__dot { background: var(--cw-clay); }
 .task-status--review .task-status__dot { background: var(--cw-warn); }
 .task-status--done   .task-status__dot { background: #3a6b52; }
+
+/* Priority pill. Shown on board cards (P0–P3; "none" is hidden) so the most
+   important work is obvious at a glance. P0 is loudest, P3 nearly mute. */
+.task-priority {
+  display: inline-block;
+  margin-bottom: 5px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  background: var(--cw-line-soft);
+  color: var(--cw-muted);
+}
+.task-priority--p0 { background: var(--cw-clay-soft); color: var(--cw-clay-deep); }
+.task-priority--p1 { background: var(--cw-warn-bg);    color: var(--cw-warn); }
+.task-priority--p2 { background: var(--cw-line-soft);  color: var(--cw-ink-soft); }
+
+.task-edit__row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.task-edit__priority { display: inline-flex; align-items: center; gap: 7px; }
+.task-edit__priority-label { font-size: 0.8rem; color: var(--cw-muted); }
+.task-edit__priority-select { width: auto; }
+
 .task-edit__description {
   width: 100%;
   font-family: var(--cw-font-ui);

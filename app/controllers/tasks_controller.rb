@@ -52,14 +52,16 @@ class TasksController < ApplicationController
   end
 
   def task_create_params
-    permitted = params.expect(task: [ :title, :status ])
+    permitted = params.expect(task: [ :title, :status, :priority ])
     permitted.delete(:status) unless Task::STATUSES.include?(permitted[:status])
+    permitted.delete(:priority) unless Task::PRIORITIES.include?(permitted[:priority])
     permitted
   end
 
   def task_update_params
-    permitted = params.expect(task: [ :title, :description, :status ])
+    permitted = params.expect(task: [ :title, :description, :status, :priority ])
     permitted.delete(:status) unless Task::STATUSES.include?(permitted[:status])
+    permitted.delete(:priority) unless Task::PRIORITIES.include?(permitted[:priority])
     permitted
   end
 end

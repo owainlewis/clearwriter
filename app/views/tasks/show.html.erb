@@ -20,9 +20,18 @@
   <%= form_with url: task_path(@task), scope: :task, method: :patch, class: "task-edit" do |f| %>
     <%= f.text_field :title, value: @task.title, placeholder: Task::TITLE_FALLBACK,
           class: "cw-input cw-input--title task-edit__title", required: true %>
-    <span class="task-status task-status--<%= @task.status %>">
-      <span class="task-status__dot"></span><%= Task::STATUS_LABELS[@task.status] %>
-    </span>
+    <div class="task-edit__row">
+      <span class="task-status task-status--<%= @task.status %>">
+        <span class="task-status__dot"></span><%= Task::STATUS_LABELS[@task.status] %>
+      </span>
+      <label class="task-edit__priority">
+        <span class="task-edit__priority-label">Priority</span>
+        <%= f.select :priority,
+              Task::PRIORITIES.map { |p| [ Task::PRIORITY_LABELS[p], p ] },
+              { selected: @task.priority },
+              class: "cw-input task-edit__priority-select" %>
+      </label>
+    </div>
     <%= f.text_area :description, value: @task.description, rows: 3,
           placeholder: "Add a description…", class: "cw-input task-edit__description" %>
     <div class="task-edit__actions">

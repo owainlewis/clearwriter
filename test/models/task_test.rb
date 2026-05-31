@@ -15,6 +15,22 @@ class TaskTest < ActiveSupport::TestCase
     assert_includes t.errors[:status], "is not included in the list"
   end
 
+  test "create defaults priority to none and rejects unknown values" do
+    assert_equal "none", @user.tasks.create!(title: "x").priority
+
+    t = @user.tasks.build(title: "y", priority: "p9")
+    assert_not t.valid?
+    assert_includes t.errors[:priority], "is not included in the list"
+  end
+
+  test "focus_order sorts by priority then most-recent, none last" do
+    p3   = @user.tasks.create!(title: "p3", priority: "p3")
+    p0   = @user.tasks.create!(title: "p0", priority: "p0")
+    p1   = @user.tasks.create!(title: "p1", priority: "p1")
+    none = @user.tasks.create!(title: "none")
+    assert_equal [ p0, p1, p3, none ], @user.tasks.focus_order.to_a
+  end
+
   test "new tasks append to the end of their own column" do
     a = @user.tasks.create!(title: "a", status: "todo")
     b = @user.tasks.create!(title: "b", status: "todo")

@@ -40,6 +40,23 @@ class Api::TasksApiTest < ActionDispatch::IntegrationTest
     assert_equal "review", list[0]["status"]
   end
 
+  test "POST sets priority; index is focus-ordered and filters by priority" do
+    @task.update!(priority: "p3")
+    p0 = @alice.tasks.create!(title: "ship it", priority: "p0")
+
+    post "/api/v1/tasks", params: { title: "Edit thumbnail", priority: "p1" }.to_json, headers: headers
+    assert_equal "p1", JSON.parse(response.body)["priority"]
+
+    get "/api/v1/tasks", headers: headers
+    list = JSON.parse(response.body)
+    assert_equal p0.public_token, list.first["id"], "P0 sorts to the top"
+
+    get "/api/v1/tasks", params: { priority: "p0" }, headers: headers
+    filtered = JSON.parse(response.body)
+    assert_equal 1, filtered.size
+    assert_equal "p0", filtered[0]["priority"]
+  end
+
   test "show includes comments and linked documents" do
     @task.task_comments.create!(body: "starting", author_kind: "agent", author_name: "hermes-vm")
     doc = @alice.documents.create!(body: "# Script")
