@@ -4,8 +4,11 @@ module Api
       before_action :set_task, only: %i[show update destroy]
 
       def index
-        scope = current_user.tasks.order(:status, :position, :created_at)
+        # Focus-first by default so an agent fetching its queue sees P0/P1 at the
+        # top; status still breaks ties to keep board reconstruction stable.
+        scope = current_user.tasks.focus_order.order(:status, :position)
         scope = scope.where(status: params[:status]) if Task::STATUSES.include?(params[:status])
+        scope = scope.where(priority: params[:priority]) if Task::PRIORITIES.include?(params[:priority])
         render json: scope.map { |t| task_json(t) }
       end
 
@@ -35,8 +38,9 @@ module Api
       end
 
       def task_params
-        permitted = params.permit(:title, :description, :status)
+        permitted = params.permit(:title, :description, :status, :priority)
         permitted.delete(:status) unless Task::STATUSES.include?(permitted[:status])
+        permitted.delete(:priority) unless Task::PRIORITIES.include?(permitted[:priority])
         permitted
       end
 
@@ -45,6 +49,7 @@ module Api
           id: task.public_token,
           title: task.title,
           status: task.status,
+          priority: task.priority,
           description: task.description,
           updated_at: task.updated_at,
           created_at: task.created_at

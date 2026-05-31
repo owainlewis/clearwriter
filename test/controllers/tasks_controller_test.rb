@@ -44,6 +44,22 @@ class TasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "did it", @task.description
   end
 
+  test "update sets priority; invalid priority is ignored" do
+    sign_in_as @alice
+    patch task_path(@task), params: { task: { priority: "p0" } }
+    assert_equal "p0", @task.reload.priority
+
+    patch task_path(@task), params: { task: { priority: "nope" } }
+    assert_equal "p0", @task.reload.priority
+  end
+
+  test "board shows a priority pill for prioritised tasks" do
+    sign_in_as @alice
+    @alice.tasks.create!(title: "urgent thing", priority: "p0")
+    get tasks_path
+    assert_select ".task-priority--p0", text: "P0"
+  end
+
   test "reorder moves cards and renumbers, owner-scoped" do
     sign_in_as @alice
     a = @alice.tasks.create!(title: "a", status: "todo")
