@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       post :preview
     end
     resource :share, only: %i[create destroy], controller: "shares"
+    resource :pin, only: %i[create destroy], controller: "pins"
   end
   resources :collections, only: %i[index show create update destroy] do
     # Add an existing doc to / remove it from a collection (membership only).

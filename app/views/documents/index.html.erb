@@ -47,33 +47,47 @@
   <% elsif current_view == "grid" %>
     <div class="cw-doc-grid">
       <% @documents.each do |document| %>
-        <%= link_to edit_document_path(document), class: "cw-doc-card" do %>
-          <span class="cw-doc-card__title #{'cw-doc-card__title--untitled' if document.title.blank?}">
-            <%= document.title.presence || "Untitled" %>
-          </span>
-          <span class="cw-doc-card__excerpt"><%= truncate(document_card_excerpt(document), length: 190, separator: " ") %></span>
-          <span class="cw-doc-card__meta">
-            <span><%= document.updated_at.strftime("%b %-d") %></span>
-            <% if document.tags.any? %>
-              <span class="cw-doc-card__tags">
-                <% document.tags.first(3).each do |tag| %>
-                  <span class="cw-chip cw-chip--tag"><%= tag %></span>
-                <% end %>
-              </span>
-            <% end %>
-          </span>
-        <% end %>
+        <div class="cw-doc-card-wrap">
+          <%= link_to edit_document_path(document), class: "cw-doc-card" do %>
+            <span class="cw-doc-card__title #{'cw-doc-card__title--untitled' if document.title.blank?}">
+              <%= document.title.presence || "Untitled" %>
+            </span>
+            <span class="cw-doc-card__excerpt"><%= truncate(document_card_excerpt(document), length: 190, separator: " ") %></span>
+            <span class="cw-doc-card__meta">
+              <span><%= document.updated_at.strftime("%b %-d") %></span>
+              <% if document.tags.any? %>
+                <span class="cw-doc-card__tags">
+                  <% document.tags.first(3).each do |tag| %>
+                    <span class="cw-chip cw-chip--tag"><%= tag %></span>
+                  <% end %>
+                </span>
+              <% end %>
+            </span>
+          <% end %>
+          <%= button_to document_pin_path(document), method: (document.pinned ? :delete : :post),
+                class: "cw-card-pin #{'cw-card-pin--active' if document.pinned}", form_class: "cw-card-action",
+                title: (document.pinned ? "Unpin" : "Pin"),
+                "aria-label": (document.pinned ? "Unpin document" : "Pin document") do %>
+            <%= icon :pin %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   <% else %>
     <ul class="cw-doc-list">
       <% @documents.each do |document| %>
-        <li class="cw-doc-list__item">
+        <li class="cw-doc-list__item cw-doc-list__item--with-action">
           <%= link_to edit_document_path(document), class: "cw-doc-list__row" do %>
             <span class="cw-doc-list__title #{'cw-doc-list__title--untitled' if document.title.blank?}">
               <%= icon :document, class: "cw-doc-list__icon" %> <%= document.title.presence || "Untitled" %>
             </span>
             <span class="cw-doc-list__date"><%= document.updated_at.strftime("%b %-d") %></span>
+          <% end %>
+          <%= button_to document_pin_path(document), method: (document.pinned ? :delete : :post),
+                class: "cw-row-pin #{'cw-row-pin--active' if document.pinned}", form_class: "cw-row-action",
+                title: (document.pinned ? "Unpin" : "Pin"),
+                "aria-label": (document.pinned ? "Unpin document" : "Pin document") do %>
+            <%= icon :pin %>
           <% end %>
         </li>
       <% end %>

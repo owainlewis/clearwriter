@@ -1845,6 +1845,49 @@ html.app-shell-collapsed-boot .app-sidebar-show { display: inline-flex; }
 .cw-row-remove:hover { background: #fee2e2; color: #b91c1c; }
 .cw-row-remove .cw-icon { width: 16px; height: 16px; }
 
+/* Pin toggle — hidden until row hover, but always shown once a doc is pinned. */
+.cw-row-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cw-faint);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.cw-doc-list__item--with-action:hover .cw-row-pin { opacity: 1; }
+.cw-row-pin:hover { background: var(--cw-line-soft); color: var(--cw-ink); }
+.cw-row-pin--active { opacity: 1; color: var(--cw-accent, #b45309); }
+.cw-row-pin .cw-icon { width: 16px; height: 16px; }
+
+/* Grid-card pin toggle — same reveal-on-hover, persistent when active. */
+.cw-card-pin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--cw-faint);
+  cursor: pointer;
+  opacity: 0;
+  box-shadow: 0 1px 3px rgba(31, 41, 55, 0.08);
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+.cw-doc-card-wrap:hover .cw-card-pin { opacity: 1; }
+.cw-card-pin:hover { color: var(--cw-ink); }
+.cw-card-pin--active { opacity: 1; color: var(--cw-accent, #b45309); }
+.cw-card-pin .cw-icon { width: 16px; height: 16px; }
+
 /* ──────────────────────────────────────────────────────────────────────
  *  Search picker (combobox) — type to filter, click/Enter to link
  * ────────────────────────────────────────────────────────────────────── */

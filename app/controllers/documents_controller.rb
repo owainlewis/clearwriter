@@ -2,15 +2,17 @@ class DocumentsController < ApplicationController
   before_action :set_document, only: %i[edit update destroy preview]
 
   def index
-    scope = Current.user.documents.order(updated_at: :desc)
+    scope = Current.user.documents
 
     @tag = params[:tag].presence
     @since = parse_since(params[:since])
 
     scope = scope.with_tag(@tag) if @tag
-    scope = scope.updated_since(@since) if @since
+    # Pinned docs stay visible regardless of the date filter — pinning exists
+    # precisely so important docs don't fall off the bottom of the Recent view.
+    scope = scope.where("pinned OR updated_at >= ?", @since) if @since
 
-    @documents = scope
+    @documents = scope.order(pinned: :desc, updated_at: :desc)
   end
 
   def create

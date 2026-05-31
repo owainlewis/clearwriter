@@ -39,6 +39,17 @@
       <details class="cw-menu">
         <summary class="cw-menu__trigger" aria-label="Document actions">⋯</summary>
         <div class="cw-menu__panel" role="menu">
+          <% if @document.pinned %>
+            <%= button_to document_pin_path(@document), method: :delete, class: "cw-menu__item" do %>
+              <%= icon :pin %>
+              <span>Unpin</span>
+            <% end %>
+          <% else %>
+            <%= button_to document_pin_path(@document), method: :post, class: "cw-menu__item" do %>
+              <%= icon :pin %>
+              <span>Pin</span>
+            <% end %>
+          <% end %>
           <% if @document.is_public %>
             <div class="cw-menu__readout">
               <div class="cw-menu__readout-label">Public link</div>

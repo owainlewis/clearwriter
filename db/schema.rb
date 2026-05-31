@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_30_143000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_30_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_30_143000) do
     t.text "body", default: "", null: false
     t.datetime "created_at", null: false
     t.boolean "is_public", default: false, null: false
+    t.boolean "pinned", default: false, null: false
     t.string "public_token", null: false
     t.string "tags", default: [], null: false, array: true
     t.string "title", default: "", null: false
